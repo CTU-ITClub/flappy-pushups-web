@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🐛 Flappy Pushups - IT Club</title>
+    <link rel="stylesheet" href="css/style.css" />
+
+    <!-- MediaPipe Face Mesh từ CDN -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <div id="game-container">
+      <!-- Video ẩn để capture camera (sẽ được vẽ lên canvas làm background) -->
+      <video id="camera" autoplay playsinline></video>
+
+      <!-- Canvas chính của game (bao gồm cả camera background) -->
+      <canvas id="gameCanvas"></canvas>
+
+      <!-- UI Overlay -->
+      <div id="ui-overlay">
+        <div id="score">0</div>
+        <img src="assets/ITClub.png" alt="IT Club" id="it-club-logo" />
+        <div id="it-club-badge">IT Club</div>
+        <div id="speed-indicator">Speed: 1.0x</div>
+        <div id="fps-counter">FPS: 0</div>
+        <div id="backend-info">Loading AI...</div>
+      </div>
+
+      <!-- Start Screen -->
+      <div id="start-screen" class="screen hidden">
+        <img src="assets/ITClub.png" alt="IT Club" class="it-club-logo-large" />
+        <h1>🐛 Flappy Pushups</h1>
+        <p>Điều khiển bằng khuôn mặt!</p>
+        <ul>
+          <li>📹 Di chuyển đầu để điều khiển bug</li>
+          <li>👄 Mở miệng để tăng tốc (lên đến 3x)</li>
+          <li>🏆 Đánh bại Boss để chiến thắng!</li>
+        </ul>
+        <button id="startBtn">🎮 Bắt đầu chơi</button>
+        <p class="note">Cần cho phép truy cập camera</p>
+      </div>
+
+      <!-- Victory Screen -->
+      <div id="victory-screen" class="screen hidden">
+        <img src="assets/ITClub.png" alt="IT Club" class="it-club-logo-large" />
+        <h1>🏆 CHIẾN THẮNG!</h1>
+        <h2>Boss Defeated!</h2>
+        <p>Điểm: <span id="victory-score">0</span></p>
+        <button id="victoryRestartBtn">🔄 Chơi lại</button>
+      </div>
+
+      <!-- Game Over Screen -->
+      <div id="gameover-screen" class="screen hidden">
+        <img src="assets/ITClub.png" alt="IT Club" class="it-club-logo-large" />
+        <h1>💀 GAME OVER</h1>
+        <p>Điểm: <span id="final-score">0</span></p>
+        <p>Cao nhất: <span id="high-score">0</span></p>
+        <button id="restartBtn">🔄 Chơi lại (R)</button>
+        <button id="quitBtn" class="quit-btn">❌ Đóng tab (Q)</button>
+      </div>
+
+      <!-- Loading Screen -->
+      <div id="loading-screen" class="screen">
+        <img src="assets/ITClub.png" alt="IT Club" class="it-club-logo-large" />
+        <h1>⏳ Đang tải...</h1>
+        <p id="loading-status">Đang khởi tạo AI nhận diện khuôn mặt...</p>
+        <div class="loader"></div>
+      </div>
+    </div>
+
+    <!-- Game Scripts -->
+    <script src="js/faceDetection.js"></script>
+    <script src="js/bird.js"></script>
+    <script src="js/pipe.js"></script>
+    <script src="js/bullet.js"></script>
+    <script src="js/enemy.js"></script>
+    <script src="js/pinkEnemy.js"></script>
+    <script src="js/boss.js"></script>
+    <script src="js/game.js"></script>
+  </body>
+</html>

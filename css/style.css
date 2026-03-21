@@ -1,0 +1,296 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #000;
+  overflow: hidden;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#game-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+}
+
+#camera {
+  display: none; /* Video ẩn, chỉ dùng để capture */
+}
+
+#gameCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* UI Overlay */
+#ui-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 20px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+#score {
+  font-size: 72px;
+  font-weight: bold;
+  color: white;
+  text-shadow:
+    3px 3px 0 #000,
+    -3px -3px 0 #000,
+    3px -3px 0 #000,
+    -3px 3px 0 #000;
+  text-align: center;
+}
+
+/* IT Club Badge - góc trái trên */
+#it-club-badge {
+  position: absolute;
+  top: 70px;
+  left: 20px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #fff;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 6px 15px;
+  border-radius: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  letter-spacing: 2px;
+}
+
+/* IT Club Logo trong UI overlay */
+#it-club-logo {
+  position: absolute;
+  top: 10px;
+  left: 20px;
+  width: 50px;
+  height: auto;
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+/* IT Club Logo lớn trong các màn hình */
+.it-club-logo-large {
+  width: 100px;
+  height: auto;
+  margin-bottom: 15px;
+  filter: drop-shadow(2px 2px 8px rgba(102, 126, 234, 0.5));
+}
+
+#speed-indicator {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 24px;
+  color: #00ff88;
+  text-shadow:
+    2px 2px 0 #000,
+    -2px -2px 0 #000,
+    2px -2px 0 #000,
+    -2px 2px 0 #000;
+}
+
+#fps-counter {
+  position: absolute;
+  top: 50px;
+  right: 20px;
+  font-size: 16px;
+  color: #ffff00;
+  text-shadow: 2px 2px 0 #000;
+}
+
+#backend-info {
+  position: absolute;
+  top: 75px;
+  right: 20px;
+  font-size: 14px;
+  color: #00ffff;
+  text-shadow: 2px 2px 0 #000;
+}
+
+/* IT Club Header trong các màn hình */
+.it-club-header {
+  font-size: 18px;
+  font-weight: bold;
+  color: #fff;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 6px 25px;
+  border-radius: 20px;
+  display: inline-block;
+  margin-bottom: 15px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
+}
+
+/* Screens */
+.screen {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.85);
+  padding: 40px 60px;
+  border-radius: 20px;
+  text-align: center;
+  color: white;
+  z-index: 100;
+  border: 3px solid #667eea;
+  box-shadow: 0 0 30px rgba(102, 126, 234, 0.5);
+}
+
+.screen.hidden {
+  display: none;
+}
+
+.screen h1 {
+  font-size: 48px;
+  margin-bottom: 20px;
+  background: linear-gradient(45deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.screen p {
+  font-size: 18px;
+  margin: 10px 0;
+  color: #ccc;
+}
+
+.screen ul {
+  list-style: none;
+  margin: 20px 0;
+  text-align: left;
+}
+
+.screen ul li {
+  font-size: 16px;
+  margin: 10px 0;
+  color: #fff;
+}
+
+.screen button {
+  margin-top: 20px;
+  padding: 15px 40px;
+  font-size: 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: block;
+  width: 100%;
+}
+
+.screen button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(102, 126, 234, 0.6);
+}
+
+.screen button.quit-btn {
+  background: linear-gradient(45deg, #ff6b6b, #ee5a5a);
+  margin-top: 10px;
+}
+
+.screen button.quit-btn:hover {
+  box-shadow: 0 0 20px rgba(255, 107, 107, 0.6);
+}
+
+.screen .note {
+  font-size: 14px;
+  color: #888;
+  margin-top: 20px;
+}
+
+#final-score,
+#high-score,
+#victory-score {
+  color: #feca57;
+  font-weight: bold;
+  font-size: 24px;
+}
+
+/* Victory screen special */
+#victory-screen h1 {
+  background: linear-gradient(45deg, #ffd700, #ffaa00, #ffd700);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: glow 1s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    text-shadow:
+      0 0 10px #ffd700,
+      0 0 20px #ffd700;
+  }
+  to {
+    text-shadow:
+      0 0 20px #ffd700,
+      0 0 40px #ffaa00;
+  }
+}
+
+/* Loading Animation */
+.loader {
+  width: 50px;
+  height: 50px;
+  border: 5px solid #333;
+  border-top: 5px solid #667eea;
+  border-radius: 50%;
+  margin: 20px auto;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .screen {
+    padding: 30px;
+    width: 90%;
+  }
+
+  .screen h1 {
+    font-size: 32px;
+  }
+
+  #score {
+    font-size: 48px;
+  }
+
+  #speed-indicator {
+    font-size: 18px;
+  }
+
+  #it-club-badge {
+    font-size: 20px;
+    padding: 6px 15px;
+  }
+
+  .it-club-header {
+    font-size: 14px;
+    padding: 5px 18px;
+  }
+}
