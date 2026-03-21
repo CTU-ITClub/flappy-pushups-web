@@ -1,8 +1,8 @@
 /**
- * LGBT Enemy Fly Class (giống code Python)
+ * LGBT Enemy Fly Class (HOÀN TOÀN GIỐNG PYTHON)
  * Appears when score > 2
  * Even scores: Charge attack
- * Odd scores: Bullet attack
+ * Odd scores (if score > 3): Bullet attack
  */
 
 class Enemy {
@@ -15,6 +15,11 @@ class Enemy {
     static STATE_SHOOTING = 5;
     static STATE_HEART = 6;
     static STATE_EXITING = 7;
+    
+    // Attack modes (giống Python)
+    static MODE_CHARGE = 0;  // Even score - charge at player
+    static MODE_SHOOT = 1;   // Odd score - shoot bullets
+    static SHOOT_UNLOCK_SCORE = 3;  // Shoot mode only when score > 3
     
     constructor(canvas, bulletManager) {
         this.canvas = canvas;
@@ -37,24 +42,43 @@ class Enemy {
         this.state = Enemy.STATE_IDLE;
         this.stateTimer = 0;
         this.active = false;
-        this.fromLeft = true;
-        this.attackType = 'charge';  // 'charge' or 'bullet'
+        this.fromLeft = true;  // First time from left
         
-        // Charge attack (từ Python @ 240 FPS)
+        // Attack mode (giống Python)
+        this.attackMode = Enemy.MODE_CHARGE;
+        this.shootingUnlocked = false;
+        
+        // Speeds (từ Python @ 240 FPS)
+        this.chargeSpeed = 24;     // Python: 6 @ 240 FPS → 6 * 4 = 24 @ 60 FPS
+        this.enterSpeed = 16;      // Python: 4 @ 240 FPS → 4 * 4 = 16 @ 60 FPS
+        this.exitSpeed = 12;       // Python: 3 @ 240 FPS → 3 * 4 = 12 @ 60 FPS
+        
+        // Charge attack
         this.chargeTargetX = 0;
         this.chargeTargetY = 0;
-        this.chargeSpeed = 24;  // Python: 6 @ 240 FPS → 6 * 4 = 24 @ 60 FPS
-        this.enterSpeed = 16;   // Python: 4 @ 240 FPS → 4 * 4 = 16 @ 60 FPS
         this.windupDistance = 50;
+        this.pullBackDistance = 80;  // Python: 80
+        
+        // Shooting mode (giống Python)
+        this.shootTimer = 0;
+        this.shootInterval = 15;  // Python: 60 @ 240 FPS → 15 @ 60 FPS
+        this.shotsFired = 0;
+        this.maxShots = 3;
+        this.hoverAngle = 0;
         
         // Heart pattern (giống Python)
         this.heartT = 0;
         this.heartCenterX = 0;
         this.heartCenterY = 0;
         this.heartScale = 80;
+        this.heartSpeed = 0.025;  // Python: 0.025
         
         // Warning
         this.warningAlpha = 0;
+        this.warningDuration = 30;   // Python: 120 @ 240 FPS → 30 @ 60 FPS
+        this.windupDuration = 20;    // Python: 80 @ 240 FPS → 20 @ 60 FPS
+        this.windupStartX = 0;
+        this.windupShake = 0;
         
         // Animation
         this.sprites = [];
@@ -64,9 +88,6 @@ class Enemy {
         
         // Scale
         this.scale = 1;
-        
-        // Bullet fired flag
-        this.bulletFired = false;
         
         // Load sprites
         this.loadSprites();
@@ -88,8 +109,51 @@ class Enemy {
         this.height = this.baseHeight * scale;
         this.chargeSpeed = 24 * scale;
         this.enterSpeed = 16 * scale;
+        this.exitSpeed = 12 * scale;
         this.windupDistance = 50 * scale;
+        this.pullBackDistance = 80 * scale;
         this.heartScale = 80 * scale;
+    }
+    
+    /**
+     * Activate enemy with attack mode based on score (GIỐNG PYTHON)
+     */
+    activate(score = 0) {
+        this.active = true;
+        this.shootingUnlocked = score > Enemy.SHOOT_UNLOCK_SCORE;
+        
+        // Determine attack mode based on score (giống Python logic)
+        if (this.shootingUnlocked && score % 2 === 1) {
+            this.attackMode = Enemy.MODE_SHOOT;
+            this.shotsFired = 0;
+            this.shootTimer = 0;
+            if (score >= 10) {
+                this.maxShots = 5;
+                this.shootInterval = 8;  // Python: 30 @ 240 FPS → 8 @ 60 FPS
+            } else {
+                this.maxShots = 3;
+                this.shootInterval = 15; // Python: 60 @ 240 FPS → 15 @ 60 FPS
+            }
+        } else {
+            this.attackMode = Enemy.MODE_CHARGE;
+            this.maxShots = 3;
+            this.shootInterval = 15;
+        }
+        
+        // Set charge target
+        this.chargeTargetY = this.canvas.height / 2; // Will be updated to bird position
+        
+        // Start position (giống Python)
+        if (this.fromLeft) {
+            this.x = -this.width - 20;
+        } else {
+            this.x = this.canvas.width + 20;
+        }
+        
+        this.y = this.chargeTargetY - this.height / 2;
+        this.state = Enemy.STATE_ENTERING;
+        this.stateTimer = 0;
+        this.hoverAngle = 0;
     }
     
     /**
@@ -124,6 +188,10 @@ class Enemy {
     update(birdX, birdY) {
         if (!this.active) return;
         
+        // Update charge target (always track bird)
+        this.chargeTargetX = birdX; // Always track bird X
+        this.chargeTargetY = birdY; // Always track bird Y
+        
         // Animation
         this.frameCount++;
         if (this.frameCount >= this.animationSpeed) {
@@ -131,11 +199,11 @@ class Enemy {
             this.currentFrame = (this.currentFrame + 1) % this.sprites.length;
         }
         
-        this.stateTimer++; // Count frames, not milliseconds
+        this.stateTimer++;
         
         switch (this.state) {
             case Enemy.STATE_ENTERING:
-                this.updateEntering(birdX, birdY);
+                this.updateEntering();
                 break;
             case Enemy.STATE_WARNING:
                 this.updateWarning();
@@ -158,47 +226,76 @@ class Enemy {
         }
     }
     
-    updateEntering(birdX, birdY) {
-        // Entry position (giống Python)
-        const entryX = this.fromLeft ? 100 * this.scale : this.canvas.width - 100 * this.scale;
-        
-        // Smooth approach
-        this.x += (entryX - this.x) * 0.08;
-        this.y += (birdY - this.y) * 0.05;
-        
-        // Check if in position
-        if (Math.abs(this.x - entryX) < 10) {
-            if (this.attackType === 'charge') {
-                this.state = Enemy.STATE_WARNING;
-                this.chargeTargetX = birdX;
-                this.chargeTargetY = birdY;
-            } else {
-                this.state = Enemy.STATE_SHOOTING;
+    updateEntering() {
+        // Entry logic GIỐNG PYTHON
+        if (this.fromLeft) {
+            // Stay further away when shooting mode (giống Python)
+            const targetX = this.attackMode === Enemy.MODE_SHOOT 
+                ? this.canvas.width * 0.03  // 3% for shooting
+                : this.canvas.width * 0.08; // 8% for charging
+                
+            this.x += this.enterSpeed;
+            if (this.x >= targetX) {
+                this.x = targetX;
+                this.transitionAfterEntering();
             }
-            this.stateTimer = 0;
+        } else {
+            // Right side
+            const targetX = this.attackMode === Enemy.MODE_SHOOT 
+                ? this.canvas.width * 0.97  // 97% for shooting
+                : this.canvas.width * 0.92; // 92% for charging
+                
+            this.x -= this.enterSpeed;
+            if (this.x <= targetX) {
+                this.x = targetX;
+                this.transitionAfterEntering();
+            }
         }
+        
+        this.y = this.chargeTargetY - this.height / 2;
+    }
+    
+    transitionAfterEntering() {
+        // Choose next state based on attack mode (giống Python)
+        if (this.attackMode === Enemy.MODE_SHOOT) {
+            this.state = Enemy.STATE_SHOOTING;
+            this.shotsFired = 0;
+            this.shootTimer = 0;
+        } else {
+            this.state = Enemy.STATE_WARNING;
+        }
+        this.stateTimer = 0;
     }
     
     updateWarning() {
         // Flash warning line (giống Python)
         this.warningAlpha = 0.5 + Math.sin(this.stateTimer * 0.1) * 0.5;
         
-        // After 60 frames (~1 second at 60fps), start windup
-        if (this.stateTimer > 60) {
+        // After warning duration, start windup
+        if (this.stateTimer > this.warningDuration) {
             this.state = Enemy.STATE_WINDUP;
             this.stateTimer = 0;
+            this.windupStartX = this.x;
         }
     }
     
     updateWindup() {
         // Pull back before charge (giống Python)
-        const pullbackX = this.fromLeft ? -this.windupDistance : this.windupDistance;
-        this.x += pullbackX * 0.05;
+        const progress = this.stateTimer / this.windupDuration;
+        const pullAmount = Math.sin(progress * Math.PI) * this.pullBackDistance;
+        this.windupShake = (Math.random() - 0.5) * 4; // Shake effect
         
-        // After 18 frames (~0.3 second), charge
-        if (this.stateTimer > 18) {
+        if (this.fromLeft) {
+            this.x = this.windupStartX - pullAmount;
+        } else {
+            this.x = this.windupStartX + pullAmount;
+        }
+        
+        // After windup, charge!
+        if (this.stateTimer > this.windupDuration) {
             this.state = Enemy.STATE_CHARGING;
             this.stateTimer = 0;
+            // chargeTarget already being updated in update() method
         }
     }
     
@@ -219,71 +316,107 @@ class Enemy {
             this.heartCenterX = this.x;
             this.heartCenterY = this.y;
         }
+        
+        // Also check if moved off screen (emergency exit)
+        if (this.fromLeft && this.x > this.canvas.width + this.width + 50) {
+            this.startExit();
+        } else if (!this.fromLeft && this.x < -this.width - 50) {
+            this.startExit();
+        }
     }
     
     updateShooting(birdX, birdY) {
-        // Follow bird Y position smoothly
-        this.y += (birdY - this.y) * 0.05;
+        // Hover up and down while shooting (giống Python)
+        this.hoverAngle += 0.05;
+        const hoverOffset = Math.sin(this.hoverAngle) * 30 * this.scale;
+        this.y = (this.canvas.height / 2) + hoverOffset - this.height / 2;
         
-        // Fire bullet after 30 frames (~0.5 second at 60fps)
-        if (this.stateTimer > 30 && !this.bulletFired) {
-            this.bulletManager.spawnBullet(this.x, this.y, birdX, birdY, 8 * this.scale);
-            this.bulletFired = true;
+        // Shooting logic
+        this.shootTimer++;
+        if (this.shootTimer >= this.shootInterval && this.shotsFired < this.maxShots) {
+            this.fireBullet(birdX, birdY);
+            this.shotsFired++;
+            this.shootTimer = 0;
         }
         
-        // Exit after 90 frames (~1.5 seconds)
-        if (this.stateTimer > 90) {
-            this.state = Enemy.STATE_EXITING;
-            this.stateTimer = 0;
+        // Exit after shooting all bullets + delay
+        if (this.shotsFired >= this.maxShots && this.stateTimer > 60) { // 1 second delay
+            this.startExit();
         }
     }
     
     updateHeartPattern() {
         // Heart parametric equations (giống Python)
-        this.heartT += 0.05;
+        this.heartT += this.heartSpeed;
         
         const t = this.heartT;
         const heartX = 16 * Math.pow(Math.sin(t), 3);
         const heartY = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
         
-        this.x = this.heartCenterX + heartX * (this.heartScale / 16);
-        this.y = this.heartCenterY + heartY * (this.heartScale / 16);
+        this.x = this.heartCenterX + heartX * (this.heartScale / 16) * this.scale;
+        this.y = this.heartCenterY + heartY * (this.heartScale / 16) * this.scale;
         
         // Complete heart pattern (2π)
         if (this.heartT > Math.PI * 2) {
-            this.state = Enemy.STATE_EXITING;
-            this.stateTimer = 0;
+            this.startExit();
         }
     }
     
     updateExiting() {
         // Exit to opposite side (giống Python)
-        const exitX = this.fromLeft ? this.canvas.width + this.width : -this.width;
-        this.x += (exitX - this.x) * 0.03;
+        const exitX = this.fromLeft 
+            ? this.canvas.width + this.width * 2 
+            : -this.width * 2;
+            
+        this.x += (exitX - this.x) * 0.05; // Faster exit
         
         // Check if exited
-        if (this.x < -this.width * 2 || this.x > this.canvas.width + this.width * 2) {
+        if (this.x < -this.width * 3 || this.x > this.canvas.width + this.width * 3) {
             this.state = Enemy.STATE_IDLE;
             this.active = false;
             this.fromLeft = !this.fromLeft;  // Alternate side for next attack
         }
     }
     
+    startExit() {
+        this.state = Enemy.STATE_EXITING;
+        this.stateTimer = 0;
+    }
+    
+    fireBullet(targetX, targetY) {
+        // Fire rainbow bullet toward player (giống Python)
+        const bulletSpeed = 8 * this.scale;
+        this.bulletManager.spawnBullet(
+            this.x + this.width / 2, 
+            this.y + this.height / 2, 
+            targetX, 
+            targetY, 
+            bulletSpeed
+        );
+    }
+    
     draw() {
         if (!this.active) return;
         
-        // Draw warning line during warning state (giống Python)
+        // Draw warning line during warning state - FULL SCREEN (giống Python)
         if (this.state === Enemy.STATE_WARNING) {
             this.ctx.save();
             this.ctx.strokeStyle = `rgba(255, 0, 0, ${this.warningAlpha})`;
-            this.ctx.lineWidth = 3;
-            this.ctx.setLineDash([10, 10]);
+            this.ctx.lineWidth = 4 * this.scale;
+            this.ctx.setLineDash([10 * this.scale, 10 * this.scale]);
+            
+            // Draw line from enemy to opposite edge (FULL SCREEN)
+            const startX = this.x + this.width / 2;
+            const startY = this.y + this.height / 2;
+            
+            // Line goes to opposite edge of screen (giống Python)
+            const endX = this.fromLeft ? this.canvas.width : 0;
+            const endY = startY;
             
             this.ctx.beginPath();
-            this.ctx.moveTo(this.x, this.y);
-            this.ctx.lineTo(this.chargeTargetX, this.chargeTargetY);
+            this.ctx.moveTo(startX, startY);
+            this.ctx.lineTo(endX, endY);
             this.ctx.stroke();
-            
             this.ctx.restore();
         }
         
@@ -293,15 +426,18 @@ class Enemy {
         
         this.ctx.save();
         
+        // Add windup shake effect
+        const shakeX = this.state === Enemy.STATE_WINDUP ? this.windupShake : 0;
+        
         // Flip sprite based on direction (giống Python)
         if (!this.fromLeft) {
-            this.ctx.translate(this.x, this.y);
+            this.ctx.translate(this.x + shakeX, this.y);
             this.ctx.scale(-1, 1);
             this.ctx.drawImage(sprite, -this.width / 2, -this.height / 2, this.width, this.height);
         } else {
             this.ctx.drawImage(
                 sprite,
-                this.x - this.width / 2,
+                this.x - this.width / 2 + shakeX,
                 this.y - this.height / 2,
                 this.width,
                 this.height
@@ -345,8 +481,9 @@ class Enemy {
         this.state = Enemy.STATE_IDLE;
         this.active = false;
         this.stateTimer = 0;
+        this.shotsFired = 0;
+        this.hoverAngle = 0;
         this.x = -100;
-        this.bulletFired = false;
     }
 }
 

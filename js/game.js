@@ -104,14 +104,15 @@ class Game {
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
 
-    // Calculate UI scale GIỐNG PYTHON
-    // Python ở windowed mode ban đầu: SCREEN = CAM size, UI_SCALE = 1.0
-    // Chúng ta cũng nên giữ scale = 1.0 ở kích thước base
-    // Base size = camera resolution (thường 640x480)
-    // Tạm giả định camera là 640x480 (có thể get từ video element)
-    const baseCameraWidth = 640;
-    const baseCameraHeight = 480;
-    const baseSize = Math.min(baseCameraWidth, baseCameraHeight); // = 480
+    // Calculate UI scale ĐÚNG GIỐNG PYTHON
+    // Get ACTUAL camera resolution from video element
+    let camWidth = 640, camHeight = 480; // fallback
+    if (this.videoElement && this.videoElement.videoWidth > 0) {
+      camWidth = this.videoElement.videoWidth;
+      camHeight = this.videoElement.videoHeight;
+    }
+    
+    const baseSize = Math.min(camWidth, camHeight);
     const currentSize = Math.min(this.canvas.width, this.canvas.height);
     this.uiScale = currentSize / baseSize;
 
@@ -430,7 +431,7 @@ class Game {
       !this.enemy.isActive() &&
       !this.bossActivated
     ) {
-      this.enemy.activate(this.score, this.bird.y);
+      this.enemy.activate(this.score);
       this.lastEnemyScore = this.score;
     }
 
