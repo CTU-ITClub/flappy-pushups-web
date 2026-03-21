@@ -10,11 +10,36 @@
     <script
       src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"
       crossorigin="anonymous"
+      onerror="console.error('Failed to load MediaPipe Camera Utils')"
     ></script>
     <script
       src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"
       crossorigin="anonymous"
+      onerror="console.error('Failed to load MediaPipe Face Mesh')"
     ></script>
+
+    <!-- Check if MediaPipe loaded properly -->
+    <script>
+      window.addEventListener("DOMContentLoaded", () => {
+        console.log("🔍 Checking MediaPipe libraries...");
+
+        if (typeof FaceMesh === "undefined") {
+          console.error("❌ MediaPipe Face Mesh not loaded");
+          alert(
+            "❌ Không thể tải MediaPipe AI.\n\nKiểm tra:\n• Kết nối internet\n• Trình duyệt hỗ trợ WebGL\n• Tắt adblock\n\nSau đó refresh trang.",
+          );
+        } else {
+          console.log("✅ MediaPipe Face Mesh loaded");
+        }
+
+        if (typeof Camera === "undefined") {
+          console.error("❌ MediaPipe Camera Utils not loaded");
+          alert("❌ Không thể tải MediaPipe Camera.\n\nThử refresh trang.");
+        } else {
+          console.log("✅ MediaPipe Camera Utils loaded");
+        }
+      });
+    </script>
   </head>
   <body>
     <div id="game-container">

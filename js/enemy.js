@@ -13,8 +13,7 @@ class Enemy {
     static STATE_WINDUP = 3;
     static STATE_CHARGING = 4;
     static STATE_SHOOTING = 5;
-    static STATE_HEART = 6;
-    static STATE_EXITING = 7;
+    static STATE_EXITING = 6;
     
     // Attack modes (giống Python)
     static MODE_CHARGE = 0;  // Even score - charge at player
@@ -118,7 +117,9 @@ class Enemy {
     /**
      * Activate enemy with attack mode based on score (GIỐNG PYTHON)
      */
-    activate(score = 0) {
+    activate(score = 0, birdX = 0, birdY = 0) {
+        console.log(`🎯 LGBT Enemy activating - Score: ${score}`);
+        
         this.active = true;
         this.shootingUnlocked = score > Enemy.SHOOT_UNLOCK_SCORE;
         
@@ -134,14 +135,17 @@ class Enemy {
                 this.maxShots = 3;
                 this.shootInterval = 15; // Python: 60 @ 240 FPS → 15 @ 60 FPS
             }
+            console.log(`🔫 SHOOT mode activated - ${this.maxShots} shots, interval: ${this.shootInterval}`);
         } else {
             this.attackMode = Enemy.MODE_CHARGE;
             this.maxShots = 3;
             this.shootInterval = 15;
+            console.log(`⚡ CHARGE mode activated`);
         }
         
-        // Set charge target
-        this.chargeTargetY = this.canvas.height / 2; // Will be updated to bird position
+        // Set charge target ONCE - LOCKED position when spawned (giống Python)
+        this.chargeTargetY = birdY || (this.canvas.height / 2);
+        this.chargeTargetX = birdX || (this.canvas.width / 2); // For diagonal charges
         
         // Start position (giống Python)
         if (this.fromLeft) {
@@ -154,43 +158,15 @@ class Enemy {
         this.state = Enemy.STATE_ENTERING;
         this.stateTimer = 0;
         this.hoverAngle = 0;
-    }
-    
-    /**
-     * Activate enemy (giống Python logic)
-     * Even scores: Charge attack
-     * Odd scores: Bullet attack
-     */
-    activate(score, birdY) {
-        if (this.state !== Enemy.STATE_IDLE) return;
         
-        this.active = true;
-        this.fromLeft = score % 2 === 0;  // Alternate sides
-        this.state = Enemy.STATE_ENTERING;
-        this.stateTimer = 0;
-        this.bulletFired = false;
-        
-        // Set entry position
-        if (this.fromLeft) {
-            this.x = -this.width;
-        } else {
-            this.x = this.canvas.width + this.width;
-        }
-        this.y = birdY;
-        this.targetY = birdY;
-        
-        // Determine attack type based on score (giống Python)
-        // Even scores (2, 4, 6...): charge attack
-        // Odd scores (3, 5, 7...): bullet attack
-        this.attackType = (score % 2 === 0) ? 'charge' : 'bullet';
+        console.log(`📍 Enemy spawned at (${this.x}, ${this.y}) targeting Y: ${this.chargeTargetY}`);
     }
     
     update(birdX, birdY) {
         if (!this.active) return;
         
-        // Update charge target (always track bird)
-        this.chargeTargetX = birdX; // Always track bird X
-        this.chargeTargetY = birdY; // Always track bird Y
+        // DON'T continuously update charge target - only set once in activate()!
+        // This was the bug - enemy should charge to LOCKED position, not chase player
         
         // Animation
         this.frameCount++;
@@ -216,9 +192,6 @@ class Enemy {
                 break;
             case Enemy.STATE_SHOOTING:
                 this.updateShooting(birdX, birdY);
-                break;
-            case Enemy.STATE_HEART:
-                this.updateHeartPattern();
                 break;
             case Enemy.STATE_EXITING:
                 this.updateExiting();
@@ -258,10 +231,12 @@ class Enemy {
     transitionAfterEntering() {
         // Choose next state based on attack mode (giống Python)
         if (this.attackMode === Enemy.MODE_SHOOT) {
+            console.log(`🔫 Transitioning to SHOOTING state`);
             this.state = Enemy.STATE_SHOOTING;
             this.shotsFired = 0;
             this.shootTimer = 0;
         } else {
+            console.log(`⚡ Transitioning to WARNING state (charge mode)`);
             this.state = Enemy.STATE_WARNING;
         }
         this.stateTimer = 0;
@@ -300,29 +275,26 @@ class Enemy {
     }
     
     updateCharging() {
-        // Charge towards locked target (giống Python)
-        const dx = this.chargeTargetX - this.x;
-        const dy = this.chargeTargetY - this.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        
-        if (distance > 5) {
-            this.x += (dx / distance) * this.chargeSpeed;
-            this.y += (dy / distance) * this.chargeSpeed;
+        // Charge HORIZONTALLY in straight line (giống Python)
+        // Y position is LOCKED, only X moves
+        if (this.fromLeft) {
+            this.x += this.chargeSpeed;
+            // Exit when off screen on the right
+            if (this.x > this.canvas.width + this.width + 50) {
+                this.state = Enemy.STATE_EXITING;
+                this.stateTimer = 0;
+            }
         } else {
-            // Start heart pattern after reaching target
-            this.state = Enemy.STATE_HEART;
-            this.stateTimer = 0;
-            this.heartT = 0;
-            this.heartCenterX = this.x;
-            this.heartCenterY = this.y;
+            this.x -= this.chargeSpeed;
+            // Exit when off screen on the left
+            if (this.x < -this.width - 50) {
+                this.state = Enemy.STATE_EXITING;
+                this.stateTimer = 0;
+            }
         }
         
-        // Also check if moved off screen (emergency exit)
-        if (this.fromLeft && this.x > this.canvas.width + this.width + 50) {
-            this.startExit();
-        } else if (!this.fromLeft && this.x < -this.width - 50) {
-            this.startExit();
-        }
+        // Y position stays LOCKED at target Y (giống Python)
+        this.y = this.chargeTargetY - this.height / 2;
     }
     
     updateShooting(birdX, birdY) {
@@ -334,6 +306,7 @@ class Enemy {
         // Shooting logic
         this.shootTimer++;
         if (this.shootTimer >= this.shootInterval && this.shotsFired < this.maxShots) {
+            console.log(`💥 Firing bullet ${this.shotsFired + 1}/${this.maxShots}`);
             this.fireBullet(birdX, birdY);
             this.shotsFired++;
             this.shootTimer = 0;
@@ -341,40 +314,33 @@ class Enemy {
         
         // Exit after shooting all bullets + delay
         if (this.shotsFired >= this.maxShots && this.stateTimer > 60) { // 1 second delay
-            this.startExit();
-        }
-    }
-    
-    updateHeartPattern() {
-        // Heart parametric equations (giống Python)
-        this.heartT += this.heartSpeed;
-        
-        const t = this.heartT;
-        const heartX = 16 * Math.pow(Math.sin(t), 3);
-        const heartY = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
-        
-        this.x = this.heartCenterX + heartX * (this.heartScale / 16) * this.scale;
-        this.y = this.heartCenterY + heartY * (this.heartScale / 16) * this.scale;
-        
-        // Complete heart pattern (2π)
-        if (this.heartT > Math.PI * 2) {
+            console.log(`🚪 All bullets fired, exiting...`);
             this.startExit();
         }
     }
     
     updateExiting() {
-        // Exit to opposite side (giống Python)
-        const exitX = this.fromLeft 
-            ? this.canvas.width + this.width * 2 
-            : -this.width * 2;
-            
-        this.x += (exitX - this.x) * 0.05; // Faster exit
+        // Exit at constant speed (giống Python)
+        if (this.fromLeft) {
+            this.x += this.exitSpeed;
+        } else {
+            this.x -= this.exitSpeed;
+        }
         
-        // Check if exited
-        if (this.x < -this.width * 3 || this.x > this.canvas.width + this.width * 3) {
+        // Check if completely exited (giống Python thresholds)
+        if ((this.fromLeft && this.x > this.canvas.width + this.width + 50) ||
+            (!this.fromLeft && this.x < -this.width - 50)) {
+            
+            console.log(`🔄 Enemy exited, respawning from opposite side`);
+            
             this.state = Enemy.STATE_IDLE;
             this.active = false;
             this.fromLeft = !this.fromLeft;  // Alternate side for next attack
+            
+            // Reset state for next spawn
+            this.stateTimer = 0;
+            this.shotsFired = 0;
+            this.shootTimer = 0;
         }
     }
     
@@ -443,10 +409,10 @@ class Enemy {
                 this.height
             );
         }
-        
+
         this.ctx.restore();
     }
-    
+
     /**
      * Check collision with bird (giống Python)
      */

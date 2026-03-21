@@ -106,12 +106,13 @@ class Game {
 
     // Calculate UI scale ĐÚNG GIỐNG PYTHON
     // Get ACTUAL camera resolution from video element
-    let camWidth = 640, camHeight = 480; // fallback
+    let camWidth = 640,
+      camHeight = 480; // fallback
     if (this.videoElement && this.videoElement.videoWidth > 0) {
       camWidth = this.videoElement.videoWidth;
       camHeight = this.videoElement.videoHeight;
     }
-    
+
     const baseSize = Math.min(camWidth, camHeight);
     const currentSize = Math.min(this.canvas.width, this.canvas.height);
     this.uiScale = currentSize / baseSize;
@@ -172,21 +173,54 @@ class Game {
 
   async init() {
     try {
-      this.updateLoadingStatus("Đang khởi tạo MediaPipe Face Mesh...");
+      this.updateLoadingStatus("Đang khởi tạo AI nhận diện khuôn mặt...");
+      console.log("🎮 Game initialization started");
 
       // Initialize face detector
       this.faceDetector = new FaceDetector();
 
       this.faceDetector.onReady = () => {
+        console.log("🎉 Face detector ready!");
         this.ui.backend.textContent = "AI: MediaPipe (WebGL GPU)";
       };
 
       this.faceDetector.onError = (error) => {
-        console.error("Face detection error:", error);
-        this.updateLoadingStatus("Lỗi: " + error.message);
+        console.error("❌ Face detection error:", error);
+        
+        // Show specific error message
+        let errorMsg = "Lỗi AI: ";
+        if (error.message.includes('Camera access denied')) {
+          errorMsg += "Cần cho phép truy cập camera để chơi game";
+        } else if (error.message.includes('MediaPipe')) {
+          errorMsg += "Không thể tải MediaPipe. Kiểm tra kết nối internet";
+        } else if (error.message.includes('timeout')) {
+          errorMsg += "Quá thời gian. Thử refresh trang";
+        } else {
+          errorMsg += error.message;
+        }
+        
+        this.updateLoadingStatus(errorMsg);
+        
+        // Show retry button after 3 seconds
+        setTimeout(() => {
+          const retryHTML = `
+            <div style="text-align: center; color: white;">
+              <p>${errorMsg}</p>
+              <button onclick="location.reload()" style="padding: 10px 20px; font-size: 16px;">
+                🔄 Thử lại
+              </button>
+            </div>
+          `;
+          document.body.innerHTML += retryHTML;
+        }, 3000);
       };
 
-      await this.faceDetector.init(this.videoElement);
+      console.log("🤖 Starting face detector initialization...");
+      const success = await this.faceDetector.init(this.videoElement);
+      
+      if (!success) {
+        throw new Error('Face detector initialization failed');
+      }
 
       this.updateLoadingStatus("Đang tải game assets...");
 
@@ -250,8 +284,6 @@ class Game {
   startGame() {
     this.state = "playing";
     this.score = 0;
-    this.lastEnemyScore = 0;
-    this.lastPinkEnemyScore = 0;
     this.bossActivated = false;
 
     this.ui.startScreen.classList.add("hidden");
@@ -283,16 +315,16 @@ class Game {
   renderLoop() {
     const currentTime = performance.now();
     const deltaTime = currentTime - this.lastFrameTime;
-    
+
     // Lock to 60 FPS (16.67ms per frame)
     // Python runs at 240 FPS, speeds multiplied by 4 for 60 FPS
     const targetFrameTime = 1000 / 60; // 16.67ms
-    
+
     if (deltaTime < targetFrameTime) {
       requestAnimationFrame(() => this.renderLoop());
       return; // Skip this frame
     }
-    
+
     this.lastFrameTime = currentTime;
 
     // Update FPS
@@ -424,21 +456,19 @@ class Game {
       }
     }
 
-    // Activate LGBT enemy (score > 1, appears at score 2+)
+    // Activate LGBT enemy (score > 1, respawn continuously when not active)
     if (
       this.score > GameConstants.ENEMY_UNLOCK_SCORE &&
-      this.score !== this.lastEnemyScore &&
       !this.enemy.isActive() &&
       !this.bossActivated
     ) {
-      this.enemy.activate(this.score);
-      this.lastEnemyScore = this.score;
+      this.enemy.activate(this.score, this.bird.x, this.bird.y);
     }
 
-    // Activate Pink enemy (score > 5, appears at score 6+)
+    // Activate Pink enemy (score > 5, appears every 3 scores when inactive)
     if (
       this.score > GameConstants.PINK_ENEMY_UNLOCK_SCORE &&
-      this.score !== this.lastPinkEnemyScore &&
+      this.score % 3 === 0 &&
       !this.pinkEnemy.isActive() &&
       !this.bossActivated
     ) {
@@ -449,7 +479,6 @@ class Game {
         this.canvas.width,
         this.canvas.height,
       );
-      this.lastPinkEnemyScore = this.score;
     }
 
     // Update enemies

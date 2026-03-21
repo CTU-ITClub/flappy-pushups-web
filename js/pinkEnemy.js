@@ -1,7 +1,7 @@
 /**
  * Pink Bird Enemy Class
  * Diagonal attack enemy (appears when score > 6)
- * Giống hệt code Python
+ * HOÀN TOÀN GIỐNG PYTHON - với size 0.45 scale
  */
 
 class PinkEnemy {
@@ -21,11 +21,13 @@ class PinkEnemy {
     this.enterTargetX = 0;
     this.enterTargetY = 0;
 
-    // Size (will be scaled)
-    this.baseWidth = 40;
-    this.baseHeight = 40;
-    this.width = this.baseWidth;
-    this.height = this.baseHeight;
+    // Size - GIỐNG PYTHON: 0.45 * original sprite size
+    // Will be calculated when sprites load
+    this.baseScale = 0.45; // Python: PINK_ENEMY_BASE_SCALE = 0.45
+    this.baseWidth = 0; // Will be set after sprite loads
+    this.baseHeight = 0; // Will be set after sprite loads
+    this.width = 0;
+    this.height = 0;
 
     // State machine
     this.state = PinkEnemy.STATE_IDLE;
@@ -35,15 +37,16 @@ class PinkEnemy {
     // Movement (từ Python @ 240 FPS)
     this.velocityX = 0;
     this.velocityY = 0;
-    this.enterSpeed = 16;      // Python: 4 @ 240 FPS → 4 * 4 = 16 @ 60 FPS
-    this.diagonalSpeed = 20;   // Python: 5 @ 240 FPS → 5 * 4 = 20 @ 60 FPS
+    this.enterSpeed = 16; // Python: 4 @ 240 FPS → 4 * 4 = 16 @ 60 FPS
+    this.diagonalSpeed = 20; // Python: 5 @ 240 FPS → 5 * 4 = 20 @ 60 FPS
     this.fromLeft = true;
 
-    // Warning
-    this.warningDuration = 70; // frames
+    // Warning (từ Python)
+    this.warningDuration = 70; // frames (giống Python)
     this.warningFlash = 0;
     this.warningStart = { x: 0, y: 0 };
     this.warningEnd = { x: 0, y: 0 };
+    this.redFlashSpeedMultiplier = 2.16; // Python: RED_FLASH_SPEED_MULTIPLIER = 2.16
 
     // Spawn patterns (giống Python)
     this.spawnPatterns = ["bottom_left", "top_right", "bottom_right"];
@@ -58,7 +61,7 @@ class PinkEnemy {
     // Scale
     this.scale = 1;
 
-    // Load sprites
+    // Load sprites and calculate size
     this.loadSprites();
   }
 
@@ -69,13 +72,27 @@ class PinkEnemy {
     const sprite2 = new Image();
     sprite2.src = "assets/pinkbird-upflap_2.png";
 
+    // Set size when first sprite loads (GIỐNG PYTHON)
+    sprite1.onload = () => {
+      this.baseWidth = Math.max(1, Math.floor(sprite1.width * this.baseScale));
+      this.baseHeight = Math.max(
+        1,
+        Math.floor(sprite1.height * this.baseScale),
+      );
+      this.width = this.baseWidth;
+      this.height = this.baseHeight;
+    };
+
     this.sprites = [sprite1, sprite2];
   }
 
   setScale(scale) {
     this.scale = scale;
-    this.width = this.baseWidth * scale;
-    this.height = this.baseHeight * scale;
+    if (this.baseWidth > 0) {
+      // Only if sprites loaded
+      this.width = Math.max(1, Math.floor(this.baseWidth * scale));
+      this.height = Math.max(1, Math.floor(this.baseHeight * scale));
+    }
     this.enterSpeed = 16 * scale;
     this.diagonalSpeed = 20 * scale;
   }
@@ -205,7 +222,12 @@ class PinkEnemy {
   }
 
   updateWarning() {
-    this.warningFlash = Math.floor(this.stateTimer / 4) % 2;
+    // Warning flash GIỐNG PYTHON với RED_FLASH_SPEED_MULTIPLIER
+    this.warningFlash =
+      Math.floor(
+        this.stateTimer /
+          Math.max(1, Math.floor(4 / this.redFlashSpeedMultiplier)),
+      ) % 2;
 
     if (this.stateTimer >= this.warningDuration) {
       this.state = PinkEnemy.STATE_ATTACK;
