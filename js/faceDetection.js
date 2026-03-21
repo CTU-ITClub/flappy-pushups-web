@@ -252,17 +252,8 @@ class FaceDetector {
    * Get speed multiplier based on mouth openness (1x - 3x)
    */
   getSpeedMultiplier() {
-    if (!this.isMouthOpen) return 1.0;
-
-    // Map mouth openness to speed (0.03 - 0.15 → 1.0 - 3.0)
-    const minOpen = this.mouthOpenThreshold;
-    const maxOpen = 0.15;
-    const normalized = Math.min(
-      1,
-      (this.mouthOpenness - minOpen) / (maxOpen - minOpen),
-    );
-
-    return 1.0 + normalized * 2.0; // 1x to 3x
+    // Đã tắt chức năng tăng tốc bằng mở miệng
+    return 1.0;
   }
 
   /**

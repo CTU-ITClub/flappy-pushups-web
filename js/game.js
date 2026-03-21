@@ -430,8 +430,7 @@ class Game {
       // Still check ground/ceiling during boss battle
       this.checkBoundaryCollision();
 
-      // Update speed indicator
-      this.ui.speed.textContent = `BOSS BATTLE!`;
+      // Đã xóa speed indicator
       return;
     }
 
@@ -493,16 +492,12 @@ class Game {
     // Check collisions
     this.checkCollisions();
 
-    // Update speed indicator
-    this.ui.speed.textContent = `Speed: ${faceData.speedMultiplier.toFixed(1)}x`;
+    // Đã xóa speed indicator vì chức năng tăng tốc đã bị tắt
   }
 
   checkBoundaryCollision() {
-    const groundHeight = 80 * this.uiScale;
-    if (
-      this.bird.y < this.bird.height / 2 ||
-      this.bird.y > this.canvas.height - groundHeight - this.bird.height / 2
-    ) {
+    // Chỉ check ceiling - chạm đất không game over
+    if (this.bird.y < this.bird.height / 2) {
       this.startFalling();
     }
   }
@@ -537,12 +532,8 @@ class Game {
       }
     }
 
-    // Check ground/ceiling collision
-    const groundHeight = 80 * this.uiScale;
-    if (
-      this.bird.y < this.bird.height / 2 ||
-      this.bird.y > this.canvas.height - groundHeight - this.bird.height / 2
-    ) {
+    // Chỉ check ceiling collision - chạm đất không game over nữa
+    if (this.bird.y < this.bird.height / 2) {
       this.startFalling();
       return;
     }

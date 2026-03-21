@@ -227,14 +227,7 @@ class Bird {
       this.height,
     );
 
-    // Draw mouth indicator when active (giống Python)
-    if (this.mouthActive) {
-      this.ctx.beginPath();
-      this.ctx.arc(0, this.height * 0.2, this.mouthRadius, 0, Math.PI * 2);
-      this.ctx.strokeStyle = "rgba(0, 255, 136, 0.7)";
-      this.ctx.lineWidth = 3;
-      this.ctx.stroke();
-    }
+    // Vòng tròn đã bị xóa theo yêu cầu
 
     this.ctx.restore();
   }

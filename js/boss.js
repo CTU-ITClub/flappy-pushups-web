@@ -4,7 +4,7 @@
 const BossConstants = {
   BOSS_WIDTH_BASE: 220,
   BOSS_HEIGHT_BASE: 170,
-  BOMB_HEIGHT_SCALE: 0.8,
+  BOMB_HEIGHT_SCALE: 0.32, // 0.8 * 0.4 = 0.32 (giảm 0.4 lần)
   BOMB_HEIGHT_ORIGINAL: 258,
   LASER_BEAM_HEIGHT_BASE: 360,
   WARNING_SIGN_SIZE_BASE: 150,
@@ -201,7 +201,7 @@ class BossBattle {
     console.log("  Phase 1: 10 BOMBS");
     console.log("  Phase 2: 10 LASERS");
     console.log("  Phase 3: COMBO (10 BOMBS + 10 LASERS)");
-    
+
     this.state = BossBattle.STATE_SCREEN_WARNING;
     this.timer = 0;
     this.bombsSpawned = 0;
@@ -336,7 +336,9 @@ class BossBattle {
   _startBombWarning() {
     this._pickBombMarker();
     this.bombsWarningStarted++;
-    console.log(`💣 Bomb warning #${this.bombsWarningStarted}/${BossConstants.BOSS_BOMB_TOTAL} at X=${Math.round(this.markerX)}`);
+    console.log(
+      `💣 Bomb warning #${this.bombsWarningStarted}/${BossConstants.BOSS_BOMB_TOTAL} at X=${Math.round(this.markerX)}`,
+    );
     this.timer = 0;
     this.state = BossBattle.STATE_BOMB_WARNING;
   }
@@ -345,7 +347,9 @@ class BossBattle {
     this._pickBombMarker();
     this.pendingBombWarnings.push({ markerX: this.markerX, timer: 0 });
     this.bombsWarningStarted++;
-    console.log(`💣 Chain bomb warning #${this.bombsWarningStarted}/${BossConstants.BOSS_BOMB_TOTAL} at X=${Math.round(this.markerX)}`);
+    console.log(
+      `💣 Chain bomb warning #${this.bombsWarningStarted}/${BossConstants.BOSS_BOMB_TOTAL} at X=${Math.round(this.markerX)}`,
+    );
   }
 
   _createBomb(markerX = null) {
@@ -372,7 +376,9 @@ class BossBattle {
     this.pendingLaser = this._buildLaserFromTarget(this.lockedLaserTarget);
     if (this.pendingLaser) {
       this.lasersWarningStarted++;
-      console.log(`⚡ Laser warning #${this.lasersWarningStarted}/${BossConstants.BOSS_LASER_TOTAL} at Y=${Math.round(birdRect.centerY)}`);
+      console.log(
+        `⚡ Laser warning #${this.lasersWarningStarted}/${BossConstants.BOSS_LASER_TOTAL} at Y=${Math.round(birdRect.centerY)}`,
+      );
     }
     this.currentLaser = null;
     this.timer = 0;
@@ -386,7 +392,9 @@ class BossBattle {
     if (!queuedLaser) return;
     this.pendingLaserWarnings.push({ frame: queuedLaser, timer: 0 });
     this.lasersWarningStarted++;
-    console.log(`⚡ Chain laser warning #${this.lasersWarningStarted}/${BossConstants.BOSS_LASER_TOTAL} at Y=${Math.round(birdRect.centerY)}`);
+    console.log(
+      `⚡ Chain laser warning #${this.lasersWarningStarted}/${BossConstants.BOSS_LASER_TOTAL} at Y=${Math.round(birdRect.centerY)}`,
+    );
   }
 
   _startComboAssault() {
@@ -692,7 +700,9 @@ class BossBattle {
           this.pendingLaserWarnings.length === 0
         ) {
           console.log("⚡ Phase 2 COMPLETE: All 10 lasers fired");
-          console.log("🔥 Starting Phase 3: COMBO ASSAULT (10 bombs + 10 lasers)");
+          console.log(
+            "🔥 Starting Phase 3: COMBO ASSAULT (10 bombs + 10 lasers)",
+          );
           this._startComboAssault();
         }
         break;
