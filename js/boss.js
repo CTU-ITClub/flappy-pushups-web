@@ -2,31 +2,36 @@
 
 // Constants for Boss Battle
 const BossConstants = {
-    BOSS_WIDTH_BASE: 220,
-    BOSS_HEIGHT_BASE: 170,
-    BOMB_HEIGHT_SCALE: 0.8,
-    BOMB_HEIGHT_ORIGINAL: 258,
-    LASER_BEAM_HEIGHT_BASE: 360,
-    WARNING_SIGN_SIZE_BASE: 150,
-    BOSS_ENTER_SPEED_BASE: 2.2 * 4,
-    BOSS_EXIT_SPEED_BASE: 3.0 * 4,
-    BOSS_BOMB_FALL_SPEED_BASE: 7.5 * 4,
-    BOSS_WARNING_DURATION_FRAMES: Math.floor(60 * 1.4),
-    BOSS_ATTACK_WARNING_FRAMES: 60,
-    BOSS_BOMB_TOTAL: 10,
-    BOSS_BOMB_CHAIN_INTERVAL_FRAMES: Math.floor(60 * 0.3),
-    BOSS_LASER_TOTAL: 10,
-    BOSS_LASER_CHAIN_INTERVAL_FRAMES: Math.floor(60 * 0.3),
-    BOSS_POST_ATTACK_DELAY_FRAMES: 60,
-    BOSS_LOW_BATTERY_BLINK_PERIOD: Math.max(1, Math.floor(60 * 0.15)),
+  BOSS_WIDTH_BASE: 220,
+  BOSS_HEIGHT_BASE: 170,
+  BOMB_HEIGHT_SCALE: 0.8,
+  BOMB_HEIGHT_ORIGINAL: 258,
+  LASER_BEAM_HEIGHT_BASE: 360,
+  WARNING_SIGN_SIZE_BASE: 150,
+  // Speed values @ 60 FPS (converted from Python 240 FPS)
+  // Python uses: speed * UI_SCALE where UI_SCALE is based on screen size
+  // For consistent feel, we use base speed (Python 240 FPS speed * 4 for 60 FPS)
+  // BUT the uiScale multiplication should be separate
+  BOSS_ENTER_SPEED: 2.2, // Python: 2.2 * UI_SCALE @ 240 FPS
+  BOSS_EXIT_SPEED: 3.0, // Python: 3.0 * UI_SCALE @ 240 FPS
+  BOSS_BOMB_FALL_SPEED: 7.5, // Python: 7.5 * UI_SCALE @ 240 FPS - NOT x4 because screen moves same
+  FPS_MULTIPLIER: 4, // 240/60 = 4
+  BOSS_WARNING_DURATION_FRAMES: Math.floor(60 * 1.4), // 1.4 seconds
+  BOSS_ATTACK_WARNING_FRAMES: 60, // 1 second
+  BOSS_BOMB_TOTAL: 10,
+  BOSS_BOMB_CHAIN_INTERVAL_FRAMES: Math.floor(60 * 0.5), // 0.5 seconds (increased from 0.3 for better gameplay)
+  BOSS_LASER_TOTAL: 10,
+  BOSS_LASER_CHAIN_INTERVAL_FRAMES: Math.floor(60 * 0.5), // 0.5 seconds (increased from 0.3 for better gameplay)
+  BOSS_POST_ATTACK_DELAY_FRAMES: 60,
+  BOSS_LOW_BATTERY_BLINK_PERIOD: Math.max(1, Math.floor(60 * 0.15)),
 };
 
 function getBossUIScale(screenWidth, screenHeight, baseSize = 480) {
-    return Math.min(screenWidth, screenHeight) / baseSize;
+  return Math.min(screenWidth, screenHeight) / baseSize;
 }
 
 function scaleBossValue(value, uiScale) {
-    return Math.max(1, Math.floor(value * uiScale));
+  return Math.max(1, Math.floor(value * uiScale));
 }
 
 class BossBattle {
@@ -146,18 +151,25 @@ class BossBattle {
       BossConstants.BOMB_HEIGHT_ORIGINAL * BossConstants.BOMB_HEIGHT_SCALE,
       uiScale,
     );
-    this.laserHeight = scaleBossValue(BossConstants.LASER_BEAM_HEIGHT_BASE, uiScale);
+    this.laserHeight = scaleBossValue(
+      BossConstants.LASER_BEAM_HEIGHT_BASE,
+      uiScale,
+    );
     this.warningSignSize = scaleBossValue(
       BossConstants.WARNING_SIGN_SIZE_BASE,
       uiScale,
     );
 
-    this.enterSpeed = BossConstants.BOSS_ENTER_SPEED_BASE * uiScale;
-    this.exitSpeed = BossConstants.BOSS_EXIT_SPEED_BASE * uiScale;
-    this.bombFallSpeed = BossConstants.BOSS_BOMB_FALL_SPEED_BASE * uiScale;
+    // Speed values converted from Python 240 FPS to Web 60 FPS
+    // FPS_MULTIPLIER = 4 (240/60)
+    const fpsMult = BossConstants.FPS_MULTIPLIER;
+    this.enterSpeed = BossConstants.BOSS_ENTER_SPEED * fpsMult * uiScale;
+    this.exitSpeed = BossConstants.BOSS_EXIT_SPEED * fpsMult * uiScale;
+    // Bomb speed: Use 1.5x multiplier for slower, fairer gameplay
+    this.bombFallSpeed = BossConstants.BOSS_BOMB_FALL_SPEED * 1.5 * uiScale;
     this.explosionStageFrames = Math.max(1, Math.floor(60 * 0.08));
     this.laserFireDuration = Math.max(1, Math.floor(60 * 0.65));
-    this.deathFallGravity = 0.5 * 4 * uiScale;
+    this.deathFallGravity = 0.5 * fpsMult * uiScale;
 
     this.targetStopX = this.screenWidth - this.width - 24 * uiScale;
     this.y = this.screenHeight * 0.12;
@@ -185,6 +197,11 @@ class BossBattle {
   }
 
   activate() {
+    console.log("👹 BOSS BATTLE ACTIVATED!");
+    console.log("  Phase 1: 10 BOMBS");
+    console.log("  Phase 2: 10 LASERS");
+    console.log("  Phase 3: COMBO (10 BOMBS + 10 LASERS)");
+    
     this.state = BossBattle.STATE_SCREEN_WARNING;
     this.timer = 0;
     this.bombsSpawned = 0;
@@ -319,6 +336,7 @@ class BossBattle {
   _startBombWarning() {
     this._pickBombMarker();
     this.bombsWarningStarted++;
+    console.log(`💣 Bomb warning #${this.bombsWarningStarted}/${BossConstants.BOSS_BOMB_TOTAL} at X=${Math.round(this.markerX)}`);
     this.timer = 0;
     this.state = BossBattle.STATE_BOMB_WARNING;
   }
@@ -327,6 +345,7 @@ class BossBattle {
     this._pickBombMarker();
     this.pendingBombWarnings.push({ markerX: this.markerX, timer: 0 });
     this.bombsWarningStarted++;
+    console.log(`💣 Chain bomb warning #${this.bombsWarningStarted}/${BossConstants.BOSS_BOMB_TOTAL} at X=${Math.round(this.markerX)}`);
   }
 
   _createBomb(markerX = null) {
@@ -353,6 +372,7 @@ class BossBattle {
     this.pendingLaser = this._buildLaserFromTarget(this.lockedLaserTarget);
     if (this.pendingLaser) {
       this.lasersWarningStarted++;
+      console.log(`⚡ Laser warning #${this.lasersWarningStarted}/${BossConstants.BOSS_LASER_TOTAL} at Y=${Math.round(birdRect.centerY)}`);
     }
     this.currentLaser = null;
     this.timer = 0;
@@ -366,6 +386,7 @@ class BossBattle {
     if (!queuedLaser) return;
     this.pendingLaserWarnings.push({ frame: queuedLaser, timer: 0 });
     this.lasersWarningStarted++;
+    console.log(`⚡ Chain laser warning #${this.lasersWarningStarted}/${BossConstants.BOSS_LASER_TOTAL} at Y=${Math.round(birdRect.centerY)}`);
   }
 
   _startComboAssault() {
@@ -545,7 +566,8 @@ class BossBattle {
         ) {
           this.chainSpawnTimer++;
           if (
-            this.chainSpawnTimer >= BossConstants.BOSS_BOMB_CHAIN_INTERVAL_FRAMES
+            this.chainSpawnTimer >=
+            BossConstants.BOSS_BOMB_CHAIN_INTERVAL_FRAMES
           ) {
             this.chainSpawnTimer = 0;
             this._enqueueChainBombWarning();
@@ -572,12 +594,14 @@ class BossBattle {
           return { hit: true, defeated: false };
         }
 
-        // Check if done with bombs
+        // Check if done with bombs → start lasers
         if (
           this.bombsDropped >= BossConstants.BOSS_BOMB_TOTAL &&
           this.activeBombs.length === 0 &&
           this.pendingBombWarnings.length === 0
         ) {
+          console.log("💣 Phase 1 COMPLETE: All 10 bombs dropped");
+          console.log("⚡ Starting Phase 2: 10 LASERS");
           this._startLaserWarning();
         } else if (
           this.bombsWarningStarted < 2 &&
@@ -661,12 +685,14 @@ class BossBattle {
           this.laserChainSpawnTimer = 0;
         }
 
-        // Check if done with lasers
+        // Check if done with lasers → start combo
         if (
           this.lasersFired >= BossConstants.BOSS_LASER_TOTAL &&
           this.activeLasers.length === 0 &&
           this.pendingLaserWarnings.length === 0
         ) {
+          console.log("⚡ Phase 2 COMPLETE: All 10 lasers fired");
+          console.log("🔥 Starting Phase 3: COMBO ASSAULT (10 bombs + 10 lasers)");
           this._startComboAssault();
         }
         break;
@@ -676,7 +702,8 @@ class BossBattle {
         if (this.bombsWarningStarted < BossConstants.BOSS_BOMB_TOTAL) {
           this.chainSpawnTimer++;
           if (
-            this.chainSpawnTimer >= BossConstants.BOSS_BOMB_CHAIN_INTERVAL_FRAMES
+            this.chainSpawnTimer >=
+            BossConstants.BOSS_BOMB_CHAIN_INTERVAL_FRAMES
           ) {
             this.chainSpawnTimer = 0;
             this._enqueueChainBombWarning();

@@ -9,7 +9,7 @@
 
 // Game Constants (from Python - 240 FPS -> 60 FPS)
 const GameConstants = {
-  ENEMY_UNLOCK_SCORE: 1, // LGBT enemy appears at score 2+
+  ENEMY_UNLOCK_SCORE: 2, // LGBT enemy appears at score 3+ (score > 2)
   PINK_ENEMY_UNLOCK_SCORE: 5, // Pink enemy appears at score 6+
   BOSS_TRIGGER_SCORE: 12, // Boss battle starts at score 12
   BOSS_WARNING_DURATION_FRAMES: Math.floor(60 * 1.4), // 1.4 seconds
@@ -186,21 +186,21 @@ class Game {
 
       this.faceDetector.onError = (error) => {
         console.error("❌ Face detection error:", error);
-        
+
         // Show specific error message
         let errorMsg = "Lỗi AI: ";
-        if (error.message.includes('Camera access denied')) {
+        if (error.message.includes("Camera access denied")) {
           errorMsg += "Cần cho phép truy cập camera để chơi game";
-        } else if (error.message.includes('MediaPipe')) {
+        } else if (error.message.includes("MediaPipe")) {
           errorMsg += "Không thể tải MediaPipe. Kiểm tra kết nối internet";
-        } else if (error.message.includes('timeout')) {
+        } else if (error.message.includes("timeout")) {
           errorMsg += "Quá thời gian. Thử refresh trang";
         } else {
           errorMsg += error.message;
         }
-        
+
         this.updateLoadingStatus(errorMsg);
-        
+
         // Show retry button after 3 seconds
         setTimeout(() => {
           const retryHTML = `
@@ -217,9 +217,9 @@ class Game {
 
       console.log("🤖 Starting face detector initialization...");
       const success = await this.faceDetector.init(this.videoElement);
-      
+
       if (!success) {
-        throw new Error('Face detector initialization failed');
+        throw new Error("Face detector initialization failed");
       }
 
       this.updateLoadingStatus("Đang tải game assets...");
@@ -446,10 +446,12 @@ class Game {
 
       // Check if should trigger boss battle
       if (this.score >= this.BOSS_TRIGGER_SCORE && !this.bossActivated) {
+        console.log("🔥 BOSS BATTLE TRIGGERED!");
         this.bossActivated = true;
         this.boss.activate();
-        // Stop spawning pipes and enemies during boss
+        // Stop spawning pipes and clear existing pipes (giống Python)
         this.pipeManager.stopSpawning();
+        this.pipeManager.clearAllPipes(); // Clear all pipes for boss battle
         this.enemy.reset();
         this.pinkEnemy.reset();
         return;

@@ -194,7 +194,7 @@ class PipeManager {
   checkSpawn() {
     // Don't spawn if disabled (e.g., during boss battle)
     if (!this.spawningEnabled) return;
-    
+
     // Spawn first pipe (delay để người chơi chuẩn bị)
     if (this.pipes.length === 0) {
       this.spawnPipe();
@@ -262,6 +262,12 @@ class PipeManager {
 
   startSpawning() {
     this.spawningEnabled = true;
+  }
+
+  clearAllPipes() {
+    // Clear all pipes instantly (for boss battle)
+    console.log(`🗑️ Clearing ${this.pipes.length} pipes for boss battle`);
+    this.pipes = [];
   }
 
   reset() {
