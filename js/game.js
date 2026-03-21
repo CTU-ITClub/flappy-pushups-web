@@ -9,8 +9,8 @@
 
 // Game Constants (from Python - 240 FPS -> 60 FPS)
 const GameConstants = {
-  ENEMY_UNLOCK_SCORE: 2, // LGBT enemy appears at score 3+ (score > 2)
-  PINK_ENEMY_UNLOCK_SCORE: 5, // Pink enemy appears at score 6+
+  ENEMY_UNLOCK_SCORE: 1, // LGBT enemy appears at score >= 2 (score > 1)
+  PINK_ENEMY_UNLOCK_SCORE: 3, // Pink enemy appears at score >= 4 (score > 3)
   BOSS_TRIGGER_SCORE: 12, // Boss battle starts at score 12
   BOSS_WARNING_DURATION_FRAMES: Math.floor(60 * 1.4), // 1.4 seconds
   BOSS_ATTACK_WARNING_FRAMES: 60, // 1 second
@@ -467,10 +467,10 @@ class Game {
       this.enemy.activate(this.score, this.bird.x, this.bird.y);
     }
 
-    // Activate Pink enemy (score > 5, appears every 3 scores when inactive)
+    // Activate Pink enemy (score >= 4, appears every 2 scores when inactive)
     if (
       this.score > GameConstants.PINK_ENEMY_UNLOCK_SCORE &&
-      this.score % 3 === 0 &&
+      this.score % 2 === 0 &&
       !this.pinkEnemy.isActive() &&
       !this.bossActivated
     ) {

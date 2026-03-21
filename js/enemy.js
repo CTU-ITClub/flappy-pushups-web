@@ -31,9 +31,9 @@ class Enemy {
     this.targetX = 0;
     this.targetY = 0;
 
-    // Size
-    this.baseWidth = 55;
-    this.baseHeight = 55;
+    // Size - tăng 20% so với trước
+    this.baseWidth = 66;  // 55 * 1.2 = 66
+    this.baseHeight = 66; // 55 * 1.2 = 66
     this.width = this.baseWidth;
     this.height = this.baseHeight;
 
