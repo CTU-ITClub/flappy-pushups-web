@@ -488,16 +488,19 @@ class BossBattle {
 
   _updateLasers(ignoreDamage = false) {
     const birdRect = this._getBirdRect();
+    // Giảm hitbox laser xuống 40% so với visual để dễ né hơn
+    const laserHitboxScale = 0.4;
 
     for (let i = this.activeLasers.length - 1; i >= 0; i--) {
       const laser = this.activeLasers[i];
 
-      // Simple line collision check
+      // Simple line collision check - với hitbox nhỏ hơn visual
+      const hitboxHeight = this.laserHeight * laserHitboxScale;
       const laserRect = {
-        x: Math.min(laser.originX, laser.endX) - this.laserHeight / 2,
-        y: Math.min(laser.originY, laser.endY) - this.laserHeight / 2,
-        width: Math.abs(laser.endX - laser.originX) + this.laserHeight,
-        height: Math.abs(laser.endY - laser.originY) + this.laserHeight,
+        x: Math.min(laser.originX, laser.endX) - hitboxHeight / 2,
+        y: Math.min(laser.originY, laser.endY) - hitboxHeight / 2,
+        width: Math.abs(laser.endX - laser.originX) + hitboxHeight,
+        height: Math.abs(laser.endY - laser.originY) + hitboxHeight,
       };
 
       if (this._rectCollision(laserRect, birdRect) && !ignoreDamage) {
