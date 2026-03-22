@@ -11,7 +11,7 @@
 const GameConstants = {
   ENEMY_UNLOCK_SCORE: 1, // LGBT enemy appears at score >= 2 (score > 1)
   PINK_ENEMY_UNLOCK_SCORE: 3, // Pink enemy appears at score >= 4 (score > 3)
-  BOSS_TRIGGER_SCORE: 3, // Boss battle - CHANGE THIS TO TEST (mặc định: 12)
+  BOSS_TRIGGER_SCORE: 12, // Boss battle - CHANGE THIS TO TEST (mặc định: 12)
   BOSS_WARNING_DURATION_FRAMES: Math.floor(60 * 1.4), // 1.4 seconds
   BOSS_ATTACK_WARNING_FRAMES: 60, // 1 second
   BOSS_BOMB_TOTAL: 10,
@@ -442,7 +442,7 @@ class Game {
         this.enemy.activateBossMode(this.bird.x, this.bird.y);
       }
       this.enemy.update(this.bird.x, this.bird.y);
-      
+
       // Check LGBT enemy collision
       if (this.enemy.checkCollision(this.bird.getHitbox())) {
         this.startFalling();
@@ -460,7 +460,7 @@ class Game {
         );
       }
       this.pinkEnemy.update(this.bird.x, this.bird.y);
-      
+
       // Check Pink enemy collision
       if (this.pinkEnemy.checkCollision(this.bird.getHitbox())) {
         this.startFalling();
@@ -469,9 +469,11 @@ class Game {
 
       // Update bullets
       this.bulletManager.update();
-      
+
       // Check bullet collision
-      const bulletHit = this.bulletManager.checkCollision(this.bird.getHitbox());
+      const bulletHit = this.bulletManager.checkCollision(
+        this.bird.getHitbox(),
+      );
       if (bulletHit) {
         this.startFalling();
         return;
@@ -596,7 +598,7 @@ class Game {
   startFalling() {
     // Chỉ xử lý nếu chưa đang falling
     if (this.state === "falling") return;
-    
+
     this.state = "falling";
     this.fallVelocity = -8 * this.uiScale; // Initial upward bump
     this.fallRotation = this.bird.rotation;
@@ -610,7 +612,7 @@ class Game {
     const gameOverSound = document.getElementById("gameOverSound");
     if (gameOverSound) {
       gameOverSound.currentTime = 0; // Reset sound
-      gameOverSound.play().catch(e => console.log("Cannot play sound:", e));
+      gameOverSound.play().catch((e) => console.log("Cannot play sound:", e));
     }
   }
 
@@ -724,10 +726,10 @@ class Game {
   returnToStart() {
     // Hide game over screen
     this.ui.gameoverScreen.classList.add("hidden");
-    
+
     // Show start screen
     this.ui.startScreen.classList.remove("hidden");
-    
+
     // Reset game state for next play
     this.state = "start";
   }

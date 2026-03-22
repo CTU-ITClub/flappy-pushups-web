@@ -1,120 +1,171 @@
-# 🐛 Flappy Pushups - IT Club
+<div align="center">
 
-**Face-controlled Flappy Bird game với Boss Battle**
+# 🐛 FLAPPY PUSHUPS
 
-Điều khiển trò chơi bằng khuôn mặt của bạn! Di chuyển đầu để điều khiển nhân vật, mở miệng để tăng tốc độ.
+### _Điều khiển game bằng khuôn mặt - Không cần bàn phím!_
 
-## 🎮 Tính năng
+[![Play Now](https://img.shields.io/badge/🎮_CHƠI_NGAY-Click_Here-brightgreen?style=for-the-badge&logoColor=white)](https://ctu-itclub.github.io/flappy-pushups-web/)
+[![Made with Love](https://img.shields.io/badge/Made_with-❤️-red?style=for-the-badge)](https://github.com/ctu-itclub)
+[![IT Club](https://img.shields.io/badge/CTU-IT_Club-blue?style=for-the-badge)](https://github.com/ctu-itclub)
 
-- 📹 **Điều khiển bằng khuôn mặt**: MediaPipe Face Mesh (AI chạy local, không cần server)
-- 👄 **Tăng tốc**: Mở miệng để tăng tốc lên đến 3x
-- 🦟 **LGBT Enemy**: Xuất hiện từ điểm số 2+
-- 🐦 **Pink Bird Enemy**: Xuất hiện từ điểm số 6+ với đường bay chéo
-- 👹 **Boss Battle**: Trận chiến Boss với bomb và laser tại điểm số 12
-- 🎓 **IT Club Branding**: Logo và theme màu IT Club
+<img src="imgForReadMe.jpg" alt="Flappy Pushups Gameplay" width="600"/>
 
-## 🚀 Chạy game
+**🎯 Bạn nghĩ Flappy Bird khó? Thử điều khiển bằng MẶT xem!**
 
-### Cách 1: Python HTTP Server
+[🎮 Chơi Ngay](https://ctu-itclub.github.io/flappy-pushups-web/) • [📖 Hướng Dẫn](#-cách-chơi) • [🛠️ Cài Đặt](#-chạy-local)
+
+</div>
+
+---
+
+## 🔥 Tại sao game này đặc biệt?
+
+> _"Quên bàn phím đi. Quên chuột đi. Chỉ cần khuôn mặt của bạn."_
+
+**Flappy Pushups** biến webcam của bạn thành controller! Sử dụng AI nhận diện khuôn mặt, game theo dõi chuyển động đầu của bạn để điều khiển nhân vật - hoàn toàn KHÔNG cần chạm vào bàn phím.
+
+### ✨ Điểm nổi bật
+
+| 🎯 Feature            | 📝 Mô tả                                         |
+| --------------------- | ------------------------------------------------ |
+| 📹 **Face Control**   | AI MediaPipe theo dõi 468 điểm trên khuôn mặt    |
+| 🧠 **100% Local**     | AI chạy trên máy bạn - không gửi dữ liệu đi đâu! |
+| 👹 **Boss Battle**    | Trận chiến epic với bom và laser tại level 12    |
+| 🦟 **Kẻ thù đa dạng** | LGBT Bird, Pink Bird với AI hành vi riêng        |
+| 📱 **Responsive**     | Chơi được trên mọi màn hình                      |
+| 🎵 **Nhạc nền**       | Nhạc sôi động làm game thêm hấp dẫn              |
+
+---
+
+## 🎮 Cách chơi
+
+```
+     🙂 Ngẩng lên     → Bug bay LÊN
+     😔 Cúi xuống     → Bug bay XUỐNG
+     😏 Nghiêng trái  → Bug bay TRÁI
+     😌 Nghiêng phải  → Bug bay PHẢI
+```
+
+### Mục tiêu
+
+1. 🚫 **Né** các ống nước (pipes)
+2. ⚡ **Tránh** kẻ thù và đạn
+3. 👹 **Đánh bại** Boss ở điểm 12 để chiến thắng!
+
+### Kẻ thù xuất hiện
+
+- **Điểm 2+**: 🦟 LGBT Bird (lao thẳng/bắn đạn)
+- **Điểm 4+**: 🐦 Pink Bird (bay chéo nguy hiểm)
+- **Điểm 12**: 👹 **BOSS BATTLE** - 10 bom + 10 laser + combo cuối!
+
+---
+
+## 🚀 Chơi Online
+
+### 👉 [**CLICK ĐÂY ĐỂ CHƠI NGAY!**](https://ctu-itclub.github.io/flappy-pushups-web/) 👈
+
+_Không cần cài đặt. Không cần download. Chỉ cần webcam và trình duyệt!_
+
+---
+
+## 💻 Chạy Local
+
+<details>
+<summary><b>📌 Click để xem hướng dẫn</b></summary>
+
+### Yêu cầu
+
+- Trình duyệt hiện đại (Chrome/Edge/Firefox)
+- Webcam
+- Cho phép quyền truy cập camera
+
+### Cách 1: Python
 
 ```bash
+git clone https://github.com/ctu-itclub/flappy-pushups-web.git
+cd flappy-pushups-web
 python -m http.server 8080
+# Mở http://localhost:8080
 ```
 
 ### Cách 2: VS Code Live Server
 
 1. Cài extension "Live Server"
-2. Right-click vào `index.html` → "Open with Live Server"
+2. Right-click `index.html` → "Open with Live Server"
 
-### Cách 3: Node.js HTTP Server
+### Cách 3: Node.js
 
 ```bash
-npm install -g http-server
-http-server
+npx http-server
 ```
 
-Sau đó mở trình duyệt: **http://localhost:8080** (hoặc port được hiển thị)
-
-**Yêu cầu:**
-- Trình duyệt hiện đại (Chrome, Edge, Firefox)
-- Camera
-- Cho phép truy cập camera khi được hỏi
-
-## 📁 Cấu trúc dự án
-
-```
-flappy-pushups/
-├── assets/       # Game sprites & images (19 files)
-│   ├── bug_1.png, bug_2.png       # Player sprites
-│   ├── boss_1.png, boss_2.png     # Boss sprites
-│   ├── boom.png, explosion_*.png  # Effects
-│   ├── lgbtbase_*.png             # LGBT enemy
-│   ├── pinkbird-*.png             # Pink enemy
-│   ├── pipe-green.png             # Obstacles
-│   └── ITClub.png                 # Logo
-├── css/
-│   └── style.css                  # Game styling
-├── js/
-│   ├── game.js                    # Main game controller
-│   ├── faceDetection.js           # MediaPipe wrapper
-│   ├── bird.js                    # Player (face-controlled)
-│   ├── pipe.js                    # Obstacles
-│   ├── enemy.js                   # LGBT enemy AI
-│   ├── pinkEnemy.js               # Pink bird AI
-│   ├── bullet.js                  # Projectile system
-│   └── boss.js                    # Boss battle system
-├── index.html                     # Main game page
-└── README.md
-```
-
-## 🎯 Cách chơi
-
-1. **Di chuyển**: Xoay đầu lên/xuống/trái/phải
-2. **Tăng tốc**: Mở miệng (tốc độ tối đa 3x)
-3. **Tránh**: Pipes (ống nước), enemies (kẻ thù)
-4. **Mục tiêu**: Đạt điểm 12 để gặp Boss, đánh bại Boss để chiến thắng!
-
-## 🛠️ Công nghệ
-
-- **HTML5 Canvas**: Rendering engine
-- **Vanilla JavaScript**: Game logic (no frameworks!)
-- **MediaPipe Face Mesh**: AI face tracking (468 landmarks)
-- **CSS3**: Modern UI styling
-
-## 📝 Chi tiết kỹ thuật
-
-### Performance
-- Target FPS: ~60
-- Collision: Pixel-perfect with masks
-- Face detection: Real-time at ~30 FPS
-- Smooth interpolation: 5-element weighted history
-
-### Face Tracking
-- **Landmarks**: 468 facial points
-- **Nose position**: Estimated at face center
-- **Range expansion**: 1.35x horizontal, 1.25x vertical
-- **Smoothing**: Weighted average [1,2,3,4,5]/15
-
-### Game Balance
-- Pipe speed: 10-24 px/frame (scales with score)
-- Bird size: 65x65 px base (auto-scales)
-- Hitbox: 50% of sprite size
-- Gap size: 4.5x bird height
-
-## 🎨 Assets
-
-All sprites custom-designed for IT Club theme.
-
-## 👥 Credits
-
-**IT Club** - Game Development Team
-
-Developed for club activities and programming education.
-
-## 📄 License
-
-MIT License - Educational use encouraged!
+</details>
 
 ---
 
-**Enjoy playing! 🎮** *Remember: The boss is waiting at score 12!* 👹
+## 🛠️ Tech Stack
+
+<div align="center">
+
+| Technology                                                                                               | Purpose                             |
+| -------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)                | Game canvas & structure             |
+| ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white)                   | Modern UI styling                   |
+| ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black) | Game logic (vanilla, no framework!) |
+| ![MediaPipe](https://img.shields.io/badge/MediaPipe-4285F4?style=flat&logo=google&logoColor=white)       | AI Face Detection (468 landmarks)   |
+
+</div>
+
+---
+
+## 📁 Cấu trúc Project
+
+```
+flappy-pushups/
+├── 🎨 assets/          # Sprites & images
+├── 🎭 css/style.css    # Game styling
+├── ⚙️ js/
+│   ├── game.js         # Main controller
+│   ├── faceDetection.js# MediaPipe AI
+│   ├── bird.js         # Player character
+│   ├── boss.js         # Boss battle system
+│   ├── enemy.js        # LGBT enemy AI
+│   ├── pinkEnemy.js    # Pink bird AI
+│   ├── bullet.js       # Projectile system
+│   └── pipe.js         # Obstacles
+├── 🎵 nhac_nen.mp3     # Background music
+├── 📄 index.html       # Entry point
+└── 📖 README.md
+```
+
+---
+
+## 👥 Credits
+
+<div align="center">
+
+### 🎓 **CTU IT Club**
+
+_Game được phát triển bởi IT Club - Đại học Cần Thơ_
+
+Dự án giáo dục nhằm giới thiệu công nghệ AI/ML và lập trình game cho sinh viên.
+
+---
+
+**⭐ Star repo này nếu bạn thấy hay!**
+
+[![GitHub stars](https://img.shields.io/github/stars/ctu-itclub/flappy-pushups-web?style=social)](https://github.com/ctu-itclub/flappy-pushups-web)
+
+</div>
+
+---
+
+<div align="center">
+
+### 🎮 Ready to play?
+
+[![Play Now](https://img.shields.io/badge/🕹️_BẮT_ĐẦU_CHƠI-Click_Here-success?style=for-the-badge)](https://ctu-itclub.github.io/flappy-pushups-web/)
+
+_Tip: Boss đang chờ bạn ở điểm 12... Bạn có đủ can đảm?_ 👹
+
+</div>
