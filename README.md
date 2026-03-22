@@ -26,14 +26,15 @@
 
 ### ✨ Điểm nổi bật
 
-| 🎯 Feature            | 📝 Mô tả                                         |
-| --------------------- | ------------------------------------------------ |
-| 📹 **Face Control**   | AI MediaPipe theo dõi 468 điểm trên khuôn mặt    |
-| 🧠 **100% Local**     | AI chạy trên máy bạn - không gửi dữ liệu đi đâu! |
-| 👹 **Boss Battle**    | Trận chiến epic với bom và laser tại level 12    |
-| 🦟 **Kẻ thù đa dạng** | LGBT Bird, Pink Bird với AI hành vi riêng        |
-| 📱 **Responsive**     | Chơi được trên mọi màn hình                      |
-| 🎵 **Nhạc nền**       | Nhạc sôi động làm game thêm hấp dẫn              |
+| 🎯 Feature | 📝 Mô tả |
+|------------|----------|
+| 📹 **Face Control** | AI MediaPipe theo dõi 468 điểm trên khuôn mặt |
+| 🧠 **100% Local** | AI chạy trên máy bạn - không gửi dữ liệu đi đâu! |
+| 👹 **Boss Battle** | Trận chiến epic với bom và laser tại level 12 |
+| 🦟 **Kẻ thù đa dạng** | LGBT Bird, Pink Bird với AI hành vi riêng |
+| 📱 **Full Responsive** | Tối ưu cho PC, Tablet, Mobile (Portrait/Landscape) |
+| 🎵 **Nhạc nền** | Nhạc sôi động làm game thêm hấp dẫn |
+| 🔒 **Safe Area** | Hỗ trợ notch phones (iPhone X+, Android) |
 
 ---
 
@@ -107,14 +108,22 @@ npx http-server
 
 <div align="center">
 
-| Technology                                                                                               | Purpose                             |
-| -------------------------------------------------------------------------------------------------------- | ----------------------------------- |
-| ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)                | Game canvas & structure             |
-| ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white)                   | Modern UI styling                   |
+| Technology | Purpose |
+|------------|---------|
+| ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white) | Game canvas & structure |
+| ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white) | Responsive UI (Mobile-first) |
 | ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black) | Game logic (vanilla, no framework!) |
-| ![MediaPipe](https://img.shields.io/badge/MediaPipe-4285F4?style=flat&logo=google&logoColor=white)       | AI Face Detection (468 landmarks)   |
+| ![MediaPipe](https://img.shields.io/badge/MediaPipe-4285F4?style=flat&logo=google&logoColor=white) | AI Face Detection (468 landmarks) |
 
 </div>
+
+### 📱 Responsive Design
+
+- **Desktop**: Full experience với tất cả hiệu ứng
+- **Tablet**: Tối ưu giao diện, touch-friendly buttons
+- **Mobile Portrait**: UI compact, dễ thao tác một tay
+- **Mobile Landscape**: Gameplay tối ưu, màn hình rộng
+- **Notch Support**: Safe area cho iPhone X+, Android punch-hole
 
 ---
 

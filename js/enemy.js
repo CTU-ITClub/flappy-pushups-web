@@ -90,6 +90,10 @@ class Enemy {
 
     // Boss mode flag
     this.bossMode = false;
+    
+    // Narrow screen adjustments
+    this.isNarrowScreen = false;
+    this.narrowSpeedMultiplier = 1.0;
 
     // Load sprites
     this.loadSprites();
@@ -109,12 +113,27 @@ class Enemy {
     this.scale = scale;
     this.width = this.baseWidth * scale;
     this.height = this.baseHeight * scale;
-    this.chargeSpeed = 24 * scale;
-    this.enterSpeed = 16 * scale;
-    this.exitSpeed = 12 * scale;
+    this.chargeSpeed = 24 * scale * this.narrowSpeedMultiplier;
+    this.enterSpeed = 16 * scale * this.narrowSpeedMultiplier;
+    this.exitSpeed = 12 * scale * this.narrowSpeedMultiplier;
     this.windupDistance = 50 * scale;
     this.pullBackDistance = 80 * scale;
     this.heartScale = 80 * scale;
+  }
+
+  /**
+   * Điều chỉnh cho màn hình hẹp
+   */
+  setNarrowScreenMode(isNarrow) {
+    this.isNarrowScreen = isNarrow;
+    // Giảm tốc độ trên màn hình hẹp để người chơi có thời gian phản ứng
+    this.narrowSpeedMultiplier = isNarrow ? 0.75 : 1.0;
+    // Re-apply scale với narrowSpeedMultiplier mới
+    if (this.scale) {
+      this.chargeSpeed = 24 * this.scale * this.narrowSpeedMultiplier;
+      this.enterSpeed = 16 * this.scale * this.narrowSpeedMultiplier;
+      this.exitSpeed = 12 * this.scale * this.narrowSpeedMultiplier;
+    }
   }
 
   /**
@@ -365,7 +384,8 @@ class Enemy {
 
   fireBullet(targetX, targetY) {
     // Fire rainbow bullet toward player (giống Python)
-    const bulletSpeed = 8 * this.scale;
+    // Giảm tốc độ bullet trên màn hình hẹp
+    const bulletSpeed = 8 * this.scale * this.narrowSpeedMultiplier;
     this.bulletManager.spawnBullet(
       this.x + this.width / 2,
       this.y + this.height / 2,

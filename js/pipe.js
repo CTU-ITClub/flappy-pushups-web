@@ -3,7 +3,7 @@
  */
 
 class Pipe {
-  constructor(canvas, x, height, uiScale) {
+  constructor(canvas, x, height, uiScale, isNarrowScreen = false) {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d");
 
@@ -21,8 +21,11 @@ class Pipe {
     this.image.src = "assets/pipe-green.png";
 
     // Gap size (4.5 * bird height, giống Python)
-    this.gapMultiplier = 4.5;
+    // Tăng gap cho màn hình hẹp để dễ né hơn
+    this.baseGapMultiplier = 4.5;
+    this.gapMultiplier = isNarrowScreen ? 5.5 : 4.5; // Tăng gap 22% cho narrow
     this.birdHeightPercent = 0.05; // BIRD_HEIGHT_PERCENT_TO_SCREEN
+    this.isNarrowScreen = isNarrowScreen;
   }
 
   getGapSize() {
@@ -160,10 +163,40 @@ class PipeManager {
     this.currentSpeed = this.baseSpeed;
 
     // Spawn settings (giống Python)
-    this.spawnThreshold = -0.15; // Spawn when last pipe X position < this * screenWidth
+    this.baseSpawnThreshold = -0.15; // Spawn when last pipe X position < this * screenWidth
+    this.spawnThreshold = this.baseSpawnThreshold;
     this.spawningEnabled = true;
 
     this.uiScale = 1;
+    
+    // Narrow screen adjustments
+    this.isNarrowScreen = false;
+    this.isVeryNarrowScreen = false;
+    this.narrowSpeedMultiplier = 1.0;
+  }
+
+  /**
+   * Điều chỉnh cho màn hình hẹp (portrait phone)
+   */
+  setNarrowScreenMode(isNarrow, isVeryNarrow = false) {
+    this.isNarrowScreen = isNarrow;
+    this.isVeryNarrowScreen = isVeryNarrow;
+    
+    if (isVeryNarrow) {
+      // Màn hình rất hẹp: giảm tốc độ 30%, spawn muộn hơn nhiều
+      this.narrowSpeedMultiplier = 0.7;
+      this.spawnThreshold = -0.35; // Spawn muộn hơn = khoảng cách xa hơn
+    } else if (isNarrow) {
+      // Màn hình hẹp: giảm tốc độ 15%, spawn muộn hơn
+      this.narrowSpeedMultiplier = 0.85;
+      this.spawnThreshold = -0.25;
+    } else {
+      // Desktop/tablet: giữ nguyên
+      this.narrowSpeedMultiplier = 1.0;
+      this.spawnThreshold = this.baseSpawnThreshold;
+    }
+    
+    console.log(`🚿 PipeManager narrow mode: speed=${this.narrowSpeedMultiplier}, threshold=${this.spawnThreshold}`);
   }
 
   getCurrentSpeed() {
@@ -174,9 +207,10 @@ class PipeManager {
     this.uiScale = uiScale;
 
     // Calculate current speed based on score (giống Python)
+    // Áp dụng narrowSpeedMultiplier cho màn hình hẹp
     this.currentSpeed = Math.min(
-      (this.baseSpeed + score * this.speedIncrement) * uiScale,
-      this.maxSpeed * uiScale,
+      (this.baseSpeed + score * this.speedIncrement) * uiScale * this.narrowSpeedMultiplier,
+      this.maxSpeed * uiScale * this.narrowSpeedMultiplier,
     );
 
     // Check if need to spawn new pipe
@@ -220,7 +254,7 @@ class PipeManager {
     const maxHeight = this.canvas.height * 0.6;
     const height = minHeight + Math.random() * (maxHeight - minHeight);
 
-    const pipe = new Pipe(this.canvas, this.canvas.width, height, this.uiScale);
+    const pipe = new Pipe(this.canvas, this.canvas.width, height, this.uiScale, this.isNarrowScreen);
     this.pipes.push(pipe);
   }
 

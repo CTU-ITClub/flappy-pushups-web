@@ -144,6 +144,11 @@ class BossBattle {
 
   syncScaledAssets() {
     const uiScale = getBossUIScale(this.screenWidth, this.screenHeight);
+    
+    // Calculate if narrow screen
+    const aspectRatio = this.screenWidth / this.screenHeight;
+    const isNarrowScreen = aspectRatio < 0.7;
+    const narrowSpeedMultiplier = isNarrowScreen ? 0.75 : 1.0;
 
     this.width = scaleBossValue(BossConstants.BOSS_WIDTH_BASE, uiScale);
     this.height = scaleBossValue(BossConstants.BOSS_HEIGHT_BASE, uiScale);
@@ -163,16 +168,20 @@ class BossBattle {
     // Speed values converted from Python 240 FPS to Web 60 FPS
     // FPS_MULTIPLIER = 4 (240/60)
     const fpsMult = BossConstants.FPS_MULTIPLIER;
-    this.enterSpeed = BossConstants.BOSS_ENTER_SPEED * fpsMult * uiScale;
-    this.exitSpeed = BossConstants.BOSS_EXIT_SPEED * fpsMult * uiScale;
-    // Bomb speed: Use 1.5x multiplier for slower, fairer gameplay
-    this.bombFallSpeed = BossConstants.BOSS_BOMB_FALL_SPEED * 1.5 * uiScale;
+    this.enterSpeed = BossConstants.BOSS_ENTER_SPEED * fpsMult * uiScale * narrowSpeedMultiplier;
+    this.exitSpeed = BossConstants.BOSS_EXIT_SPEED * fpsMult * uiScale * narrowSpeedMultiplier;
+    // Bomb speed: Use 1.5x multiplier for slower, fairer gameplay, plus narrow screen adjustment
+    this.bombFallSpeed = BossConstants.BOSS_BOMB_FALL_SPEED * 1.5 * uiScale * narrowSpeedMultiplier;
     this.explosionStageFrames = Math.max(1, Math.floor(60 * 0.08));
     this.laserFireDuration = Math.max(1, Math.floor(60 * 0.65));
     this.deathFallGravity = 0.5 * fpsMult * uiScale;
 
     this.targetStopX = this.screenWidth - this.width - 24 * uiScale;
     this.y = this.screenHeight * 0.12;
+    
+    if (isNarrowScreen) {
+      console.log(`👹 Boss narrow screen mode: speed x${narrowSpeedMultiplier}`);
+    }
 
     if (
       this.state >= BossBattle.STATE_ENTERING &&

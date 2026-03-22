@@ -96,6 +96,18 @@ class Game {
     // Bind events
     this.bindEvents();
 
+    // Handle orientation changes on mobile
+    window.addEventListener("orientationchange", () => {
+      setTimeout(() => this.resizeCanvas(), 100);
+    });
+    
+    // Also handle screen.orientation API if available
+    if (screen.orientation) {
+      screen.orientation.addEventListener("change", () => {
+        setTimeout(() => this.resizeCanvas(), 100);
+      });
+    }
+
     // Start initialization
     this.init();
   }
@@ -104,6 +116,11 @@ class Game {
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
 
+    // Calculate aspect ratio for narrow screen detection
+    const aspectRatio = this.canvas.width / this.canvas.height;
+    const isNarrowScreen = aspectRatio < 0.7; // Portrait phone
+    const isVeryNarrowScreen = aspectRatio < 0.5; // Very narrow (tall phones)
+    
     // Calculate UI scale ĐÚNG GIỐNG PYTHON
     // Get ACTUAL camera resolution from video element
     let camWidth = 640,
@@ -117,12 +134,34 @@ class Game {
     const currentSize = Math.min(this.canvas.width, this.canvas.height);
     this.uiScale = currentSize / baseSize;
 
+    // Điều chỉnh cho màn hình hẹp (điện thoại portrait)
+    // Giữ nguyên logic desktop, chỉ điều chỉnh một số tham số
+    this.narrowScreenMultiplier = 1.0;
+    if (isVeryNarrowScreen) {
+      // Rất hẹp: giảm tốc độ, tăng khoảng cách spawn
+      this.narrowScreenMultiplier = 0.7;
+    } else if (isNarrowScreen) {
+      // Hẹp: giảm nhẹ
+      this.narrowScreenMultiplier = 0.85;
+    }
+
     // Update scale for all game objects
     if (this.bird) this.bird.setScale(this.uiScale);
-    if (this.pipeManager) this.pipeManager.setScale(this.uiScale);
-    if (this.enemy) this.enemy.setScale(this.uiScale);
-    if (this.pinkEnemy) this.pinkEnemy.setScale(this.uiScale);
+    if (this.pipeManager) {
+      this.pipeManager.setScale(this.uiScale);
+      this.pipeManager.setNarrowScreenMode(isNarrowScreen, isVeryNarrowScreen);
+    }
+    if (this.enemy) {
+      this.enemy.setScale(this.uiScale);
+      this.enemy.setNarrowScreenMode(isNarrowScreen);
+    }
+    if (this.pinkEnemy) {
+      this.pinkEnemy.setScale(this.uiScale);
+      this.pinkEnemy.setNarrowScreenMode(isNarrowScreen);
+    }
     if (this.boss) this.boss.resize(this.canvas.width, this.canvas.height);
+    
+    console.log(`📐 Screen: ${this.canvas.width}x${this.canvas.height}, Aspect: ${aspectRatio.toFixed(2)}, Narrow: ${isNarrowScreen}, VeryNarrow: ${isVeryNarrowScreen}, SpeedMult: ${this.narrowScreenMultiplier}`);
   }
 
   bindEvents() {

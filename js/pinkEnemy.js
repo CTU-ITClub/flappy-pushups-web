@@ -60,6 +60,10 @@ class PinkEnemy {
 
     // Scale
     this.scale = 1;
+    
+    // Narrow screen adjustments
+    this.isNarrowScreen = false;
+    this.narrowSpeedMultiplier = 1.0;
 
     // Load sprites and calculate size
     this.loadSprites();
@@ -93,8 +97,22 @@ class PinkEnemy {
       this.width = Math.max(1, Math.floor(this.baseWidth * scale));
       this.height = Math.max(1, Math.floor(this.baseHeight * scale));
     }
-    this.enterSpeed = 16 * scale;
-    this.diagonalSpeed = 20 * scale;
+    this.enterSpeed = 16 * scale * this.narrowSpeedMultiplier;
+    this.diagonalSpeed = 20 * scale * this.narrowSpeedMultiplier;
+  }
+
+  /**
+   * Điều chỉnh cho màn hình hẹp
+   */
+  setNarrowScreenMode(isNarrow) {
+    this.isNarrowScreen = isNarrow;
+    // Giảm tốc độ trên màn hình hẹp
+    this.narrowSpeedMultiplier = isNarrow ? 0.75 : 1.0;
+    // Re-apply scale
+    if (this.scale) {
+      this.enterSpeed = 16 * this.scale * this.narrowSpeedMultiplier;
+      this.diagonalSpeed = 20 * this.scale * this.narrowSpeedMultiplier;
+    }
   }
 
   _setupSpawn(screenWidth, screenHeight) {

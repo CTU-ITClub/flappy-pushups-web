@@ -4,16 +4,36 @@
   box-sizing: border-box;
 }
 
+/* Prevent mobile browser behaviors */
+html, body {
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+
 body {
   background: #000;
   overflow: hidden;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  position: fixed;
+  width: 100%;
+  height: 100%;
 }
 
 #game-container {
   position: relative;
   width: 100vw;
   height: 100vh;
+  /* Support for notch/safe area on modern phones */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }
 
 #camera {
@@ -268,30 +288,315 @@ body {
 /* Mobile Responsive */
 @media (max-width: 768px) {
   .screen {
-    padding: 30px;
-    width: 90%;
+    padding: 25px 20px;
+    width: 92%;
+    max-width: 400px;
   }
 
   .screen h1 {
-    font-size: 32px;
+    font-size: 28px;
+    margin-bottom: 15px;
   }
 
-  #score {
-    font-size: 48px;
+  .screen p {
+    font-size: 14px;
   }
 
-  #speed-indicator {
+  .screen ul li {
+    font-size: 14px;
+    margin: 8px 0;
+  }
+
+  .screen button {
+    padding: 12px 25px;
     font-size: 18px;
   }
 
+  #score {
+    font-size: 42px;
+  }
+
+  #speed-indicator {
+    font-size: 16px;
+    top: 15px;
+    right: 15px;
+  }
+
+  #fps-counter {
+    font-size: 12px;
+    top: 40px;
+    right: 15px;
+  }
+
+  #backend-info {
+    font-size: 11px;
+    top: 58px;
+    right: 15px;
+  }
+
   #it-club-badge {
-    font-size: 20px;
-    padding: 6px 15px;
+    font-size: 14px;
+    padding: 5px 12px;
+    top: 55px;
+    left: 15px;
+  }
+
+  #it-club-logo {
+    width: 40px;
+    left: 15px;
+    top: 8px;
+  }
+
+  .it-club-logo-large {
+    width: 70px;
   }
 
   .it-club-header {
+    font-size: 12px;
+    padding: 4px 14px;
+    letter-spacing: 2px;
+  }
+
+  #ui-overlay {
+    padding: 10px;
+  }
+
+  #music-toggle {
+    width: 44px;
+    height: 44px;
+    font-size: 20px;
+    bottom: 15px;
+    right: 15px;
+  }
+
+  .screen .note {
+    font-size: 12px;
+  }
+
+  #final-score,
+  #high-score,
+  #victory-score {
+    font-size: 20px;
+  }
+}
+
+/* Small phones (< 480px) */
+@media (max-width: 480px) {
+  .screen {
+    padding: 20px 15px;
+    width: 95%;
+    border-radius: 15px;
+    border-width: 2px;
+  }
+
+  .screen h1 {
+    font-size: 24px;
+    margin-bottom: 12px;
+  }
+
+  .screen p {
+    font-size: 13px;
+    margin: 8px 0;
+  }
+
+  .screen ul {
+    margin: 15px 0;
+  }
+
+  .screen ul li {
+    font-size: 13px;
+    margin: 6px 0;
+  }
+
+  .screen button {
+    padding: 10px 20px;
+    font-size: 16px;
+    margin-top: 15px;
+    border-radius: 8px;
+  }
+
+  #score {
+    font-size: 36px;
+  }
+
+  #it-club-badge {
+    font-size: 12px;
+    padding: 4px 10px;
+    top: 48px;
+    left: 10px;
+    border-radius: 15px;
+  }
+
+  #it-club-logo {
+    width: 35px;
+    left: 10px;
+    top: 6px;
+  }
+
+  .it-club-logo-large {
+    width: 60px;
+    margin-bottom: 10px;
+  }
+
+  .it-club-header {
+    font-size: 11px;
+    padding: 4px 12px;
+    margin-bottom: 10px;
+  }
+
+  #speed-indicator {
     font-size: 14px;
-    padding: 5px 18px;
+    top: 10px;
+    right: 10px;
+  }
+
+  #fps-counter {
+    font-size: 11px;
+    top: 32px;
+    right: 10px;
+  }
+
+  #backend-info {
+    font-size: 10px;
+    top: 48px;
+    right: 10px;
+  }
+
+  #ui-overlay {
+    padding: 8px;
+  }
+
+  #music-toggle {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+    bottom: 10px;
+    right: 10px;
+  }
+
+  .screen .note {
+    font-size: 11px;
+    margin-top: 15px;
+  }
+
+  #final-score,
+  #high-score,
+  #victory-score {
+    font-size: 18px;
+  }
+}
+
+/* Tablet landscape */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .screen {
+    padding: 35px 45px;
+    max-width: 500px;
+  }
+
+  .screen h1 {
+    font-size: 40px;
+  }
+
+  #score {
+    font-size: 60px;
+  }
+
+  #it-club-badge {
+    font-size: 16px;
+  }
+}
+
+/* Landscape orientation on mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+  .screen {
+    padding: 15px 25px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .screen h1 {
+    font-size: 22px;
+    margin-bottom: 8px;
+  }
+
+  .screen p {
+    font-size: 12px;
+    margin: 5px 0;
+  }
+
+  .screen ul {
+    margin: 8px 0;
+  }
+
+  .screen ul li {
+    font-size: 12px;
+    margin: 4px 0;
+  }
+
+  .screen button {
+    padding: 8px 20px;
+    font-size: 14px;
+    margin-top: 10px;
+  }
+
+  .it-club-logo-large {
+    width: 50px;
+    margin-bottom: 8px;
+  }
+
+  .it-club-header {
+    font-size: 10px;
+    padding: 3px 10px;
+    margin-bottom: 8px;
+  }
+
+  #score {
+    font-size: 32px;
+  }
+
+  #it-club-badge {
+    font-size: 11px;
+    top: 40px;
+    padding: 3px 8px;
+  }
+
+  #it-club-logo {
+    width: 30px;
+  }
+
+  .screen .note {
+    font-size: 10px;
+    margin-top: 8px;
+  }
+
+  #final-score,
+  #high-score,
+  #victory-score {
+    font-size: 16px;
+  }
+}
+
+/* Touch-friendly: larger tap targets */
+@media (hover: none) and (pointer: coarse) {
+  .screen button {
+    min-height: 48px;
+    min-width: 120px;
+  }
+
+  #music-toggle {
+    min-width: 48px;
+    min-height: 48px;
+  }
+}
+
+/* High DPI screens */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  #score {
+    text-shadow:
+      2px 2px 0 #000,
+      -2px -2px 0 #000,
+      2px -2px 0 #000,
+      -2px 2px 0 #000;
   }
 }
 
