@@ -60,7 +60,7 @@ class PinkEnemy {
 
     // Scale
     this.scale = 1;
-    
+
     // Narrow screen adjustments
     this.isNarrowScreen = false;
     this.narrowSpeedMultiplier = 1.0;
@@ -334,7 +334,15 @@ class PinkEnemy {
   }
 
   checkCollision(hitbox) {
-    if (!this.active || this.state !== PinkEnemy.STATE_ATTACK) {
+    if (!this.active) {
+      return false;
+    }
+
+    // Chỉ không check collision khi đang entering hoặc exiting
+    if (
+      this.state === PinkEnemy.STATE_ENTERING ||
+      this.state === PinkEnemy.STATE_IDLE
+    ) {
       return false;
     }
 
@@ -346,7 +354,12 @@ class PinkEnemy {
       height: this.height,
     };
 
-    return this.rectIntersect(hitbox, enemyBox);
+    const hit = this.rectIntersect(hitbox, enemyBox);
+    if (hit) {
+      console.log(`💥 Pink Enemy HIT! State: ${this.state}`);
+    }
+    
+    return hit;
   }
 
   rectIntersect(r1, r2) {

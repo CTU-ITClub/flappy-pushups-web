@@ -100,7 +100,7 @@ class Game {
     window.addEventListener("orientationchange", () => {
       setTimeout(() => this.resizeCanvas(), 100);
     });
-    
+
     // Also handle screen.orientation API if available
     if (screen.orientation) {
       screen.orientation.addEventListener("change", () => {
@@ -120,7 +120,7 @@ class Game {
     const aspectRatio = this.canvas.width / this.canvas.height;
     const isNarrowScreen = aspectRatio < 0.7; // Portrait phone
     const isVeryNarrowScreen = aspectRatio < 0.5; // Very narrow (tall phones)
-    
+
     // Calculate UI scale ĐÚNG GIỐNG PYTHON
     // Get ACTUAL camera resolution from video element
     let camWidth = 640,
@@ -160,8 +160,10 @@ class Game {
       this.pinkEnemy.setNarrowScreenMode(isNarrowScreen);
     }
     if (this.boss) this.boss.resize(this.canvas.width, this.canvas.height);
-    
-    console.log(`📐 Screen: ${this.canvas.width}x${this.canvas.height}, Aspect: ${aspectRatio.toFixed(2)}, Narrow: ${isNarrowScreen}, VeryNarrow: ${isVeryNarrowScreen}, SpeedMult: ${this.narrowScreenMultiplier}`);
+
+    console.log(
+      `📐 Screen: ${this.canvas.width}x${this.canvas.height}, Aspect: ${aspectRatio.toFixed(2)}, Narrow: ${isNarrowScreen}, VeryNarrow: ${isVeryNarrowScreen}, SpeedMult: ${this.narrowScreenMultiplier}`,
+    );
   }
 
   bindEvents() {
@@ -615,13 +617,11 @@ class Game {
       return;
     }
 
-    // Check bullet collision (chỉ khi không mở miệng)
-    if (!this.bird.mouthActive) {
-      const bulletHit = this.bulletManager.checkCollision(hitbox);
-      if (bulletHit) {
-        this.startFalling();
-        return;
-      }
+    // Check bullet collision (đã tắt chức năng mở miệng)
+    const bulletHit = this.bulletManager.checkCollision(hitbox);
+    if (bulletHit) {
+      this.startFalling();
+      return;
     }
 
     // Chỉ check ceiling collision - chạm đất không game over nữa

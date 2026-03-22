@@ -220,6 +220,7 @@ class BulletManager {
   checkCollision(hitbox) {
     for (const bullet of this.bullets) {
       if (bullet.checkCollision(hitbox)) {
+        console.log(`💥 Bullet HIT! Bullet(${bullet.x.toFixed(0)}, ${bullet.y.toFixed(0)}), Hitbox scale: ${bullet.hitboxScale}`);
         return bullet;
       }
     }

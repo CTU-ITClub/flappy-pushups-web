@@ -90,7 +90,7 @@ class Enemy {
 
     // Boss mode flag
     this.bossMode = false;
-    
+
     // Narrow screen adjustments
     this.isNarrowScreen = false;
     this.narrowSpeedMultiplier = 1.0;
@@ -478,7 +478,14 @@ class Enemy {
 
     const combinedRadius = (this.width / 2 + hitbox.width / 2) * 0.7;
 
-    return distance < combinedRadius;
+    const hit = distance < combinedRadius;
+    if (hit) {
+      console.log(
+        `💥 LGBT Enemy HIT! Distance: ${distance.toFixed(1)}, Threshold: ${combinedRadius.toFixed(1)}, State: ${this.state}`,
+      );
+    }
+
+    return hit;
   }
 
   isActive() {
