@@ -32,7 +32,7 @@ class Enemy {
     this.targetY = 0;
 
     // Size - tăng 20% so với trước
-    this.baseWidth = 66;  // 55 * 1.2 = 66
+    this.baseWidth = 66; // 55 * 1.2 = 66
     this.baseHeight = 66; // 55 * 1.2 = 66
     this.width = this.baseWidth;
     this.height = this.baseHeight;
@@ -87,6 +87,9 @@ class Enemy {
 
     // Scale
     this.scale = 1;
+
+    // Boss mode flag
+    this.bossMode = false;
 
     // Load sprites
     this.loadSprites();
@@ -469,6 +472,44 @@ class Enemy {
     this.shotsFired = 0;
     this.hoverAngle = 0;
     this.x = -100;
+    this.bossMode = false;
+  }
+
+  /**
+   * Activate enemy in BOSS MODE - special settings for boss battle
+   * Shoots 5 bullets with 1 second interval
+   */
+  activateBossMode(birdX, birdY) {
+    console.log(`🔥 LGBT Enemy activating in BOSS MODE`);
+
+    this.active = true;
+    this.bossMode = true;
+    this.attackMode = Enemy.MODE_SHOOT;
+    this.shootingUnlocked = true;
+
+    // Boss mode: 5 bullets, 1 second apart (60 frames @ 60 FPS)
+    this.maxShots = 5;
+    this.shootInterval = 60; // 1 second interval
+    this.shotsFired = 0;
+    this.shootTimer = 0;
+
+    console.log(`🔫 BOSS MODE - ${this.maxShots} shots, 1 second interval`);
+
+    // Set charge target
+    this.chargeTargetY = birdY || this.canvas.height / 2;
+    this.chargeTargetX = birdX || this.canvas.width / 2;
+
+    // Start position (alternate sides)
+    if (this.fromLeft) {
+      this.x = -this.width - 20;
+    } else {
+      this.x = this.canvas.width + 20;
+    }
+
+    this.y = this.chargeTargetY - this.height / 2;
+    this.state = Enemy.STATE_ENTERING;
+    this.stateTimer = 0;
+    this.hoverAngle = 0;
   }
 }
 

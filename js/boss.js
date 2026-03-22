@@ -6,7 +6,7 @@ const BossConstants = {
   BOSS_HEIGHT_BASE: 170,
   BOMB_HEIGHT_SCALE: 0.32, // 0.8 * 0.4 = 0.32 (giảm 0.4 lần)
   BOMB_HEIGHT_ORIGINAL: 258,
-  LASER_BEAM_HEIGHT_BASE: 360,
+  LASER_BEAM_HEIGHT_BASE: 180, // Giảm còn phân nửa (360 / 2 = 180)
   WARNING_SIGN_SIZE_BASE: 150,
   // Speed values @ 60 FPS (converted from Python 240 FPS)
   // Python uses: speed * UI_SCALE where UI_SCALE is based on screen size
@@ -488,23 +488,53 @@ class BossBattle {
 
   _updateLasers(ignoreDamage = false) {
     const birdRect = this._getBirdRect();
-    // Giảm hitbox laser xuống 40% so với visual để dễ né hơn
-    const laserHitboxScale = 0.4;
+    // Giảm hitbox laser - chỉ check khoảng cách từ bird đến đường laser
+    const laserHitboxThickness = 12; // pixels - giảm còn phân nửa (25 → 12)
 
     for (let i = this.activeLasers.length - 1; i >= 0; i--) {
       const laser = this.activeLasers[i];
 
-      // Simple line collision check - với hitbox nhỏ hơn visual
-      const hitboxHeight = this.laserHeight * laserHitboxScale;
-      const laserRect = {
-        x: Math.min(laser.originX, laser.endX) - hitboxHeight / 2,
-        y: Math.min(laser.originY, laser.endY) - hitboxHeight / 2,
-        width: Math.abs(laser.endX - laser.originX) + hitboxHeight,
-        height: Math.abs(laser.endY - laser.originY) + hitboxHeight,
-      };
+      // Tính khoảng cách từ tâm bird đến đường laser (point-to-line distance)
+      const birdCenterX = birdRect.centerX;
+      const birdCenterY = birdRect.centerY;
 
-      if (this._rectCollision(laserRect, birdRect) && !ignoreDamage) {
-        return true; // Player hit
+      // Vector từ origin đến end của laser
+      const laserDX = laser.endX - laser.originX;
+      const laserDY = laser.endY - laser.originY;
+      const laserLength = Math.sqrt(laserDX * laserDX + laserDY * laserDY);
+
+      if (laserLength > 0) {
+        // Vector từ origin đến bird
+        const toBirdX = birdCenterX - laser.originX;
+        const toBirdY = birdCenterY - laser.originY;
+
+        // Project bird position onto laser line
+        const t = Math.max(
+          0,
+          Math.min(
+            1,
+            (toBirdX * laserDX + toBirdY * laserDY) /
+              (laserLength * laserLength),
+          ),
+        );
+
+        // Closest point on laser to bird
+        const closestX = laser.originX + t * laserDX;
+        const closestY = laser.originY + t * laserDY;
+
+        // Distance from bird to closest point on laser
+        const distX = birdCenterX - closestX;
+        const distY = birdCenterY - closestY;
+        const distance = Math.sqrt(distX * distX + distY * distY);
+
+        // Check collision - bird radius + laser thickness
+        const birdRadius =
+          (Math.min(birdRect.width, birdRect.height) / 2) * 0.5; // 50% hitbox
+        const hitDistance = birdRadius + laserHitboxThickness;
+
+        if (distance < hitDistance && !ignoreDamage) {
+          return true; // Player hit
+        }
       }
 
       laser.fireTimer++;

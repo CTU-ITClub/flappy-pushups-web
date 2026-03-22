@@ -46,10 +46,12 @@ class FaceDetector {
 
     try {
       console.log("🤖 Starting Face Detection initialization...");
-      
+
       // Check if MediaPipe is loaded
-      if (typeof FaceMesh === 'undefined') {
-        throw new Error('MediaPipe Face Mesh không load được từ CDN. Kiểm tra internet connection.');
+      if (typeof FaceMesh === "undefined") {
+        throw new Error(
+          "MediaPipe Face Mesh không load được từ CDN. Kiểm tra internet connection.",
+        );
       }
 
       console.log("✅ MediaPipe Face Mesh loaded");
@@ -95,7 +97,7 @@ class FaceDetector {
   async initCamera() {
     try {
       console.log("📷 Requesting camera access...");
-      
+
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           width: { ideal: 640 },
@@ -112,14 +114,14 @@ class FaceDetector {
       return new Promise((resolve, reject) => {
         this.videoElement.onloadedmetadata = () => {
           console.log("🎬 Video metadata loaded");
-          
+
           this.videoElement.play();
 
           console.log("🤖 Starting MediaPipe Camera...");
 
           // Check if Camera utility is loaded
-          if (typeof Camera === 'undefined') {
-            reject(new Error('MediaPipe Camera utility không load được'));
+          if (typeof Camera === "undefined") {
+            reject(new Error("MediaPipe Camera utility không load được"));
             return;
           }
 
@@ -145,7 +147,7 @@ class FaceDetector {
 
         // Add timeout
         setTimeout(() => {
-          reject(new Error('Camera initialization timeout (10s)'));
+          reject(new Error("Camera initialization timeout (10s)"));
         }, 10000);
       });
     } catch (error) {

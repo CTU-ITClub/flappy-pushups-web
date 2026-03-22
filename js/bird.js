@@ -84,8 +84,17 @@ class Bird {
 
   /**
    * Update bird position based on face tracking data (giống Python)
+   * @param {Object} faceData - Face tracking data
+   * @param {number} screenWidth - Screen width
+   * @param {number} screenHeight - Screen height  
+   * @param {number} groundY - Y position of ground (bird cannot go below this)
    */
-  update(faceData, screenWidth, screenHeight) {
+  update(faceData, screenWidth, screenHeight, groundY = null) {
+    // Calculate max Y position (ground is solid)
+    const maxY = groundY !== null 
+      ? groundY - this.height / 2 
+      : screenHeight - this.height / 2;
+
     if (faceData && faceData.faceDetected) {
       // Map face position to screen (face position is 0-1)
       // Mirror X đã được xử lý trong faceDetection.js
@@ -95,14 +104,14 @@ class Bird {
       // Offset bird to the left of face (giống Python: 15% offset)
       screenX = screenX - screenWidth * this.xOffset;
 
-      // Clamp to screen bounds
+      // Clamp to screen bounds (ground is solid barrier)
       screenX = Math.max(
         this.width / 2,
         Math.min(screenWidth - this.width / 2, screenX),
       );
       screenY = Math.max(
         this.height / 2,
-        Math.min(screenHeight - this.height / 2, screenY),
+        Math.min(maxY, screenY),
       );
 
       this.lastDetectedX = screenX;
@@ -168,6 +177,11 @@ class Bird {
           4 * this.yHistory[3] +
           5 * this.yHistory[4]) /
         15;
+    }
+
+    // Clamp final Y position to ground (đất là vật cản cứng - không thể xuyên qua)
+    if (groundY !== null && this.y > groundY - this.height / 2) {
+      this.y = groundY - this.height / 2;
     }
 
     // Calculate velocity for rotation

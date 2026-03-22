@@ -11,7 +11,7 @@
 const GameConstants = {
   ENEMY_UNLOCK_SCORE: 1, // LGBT enemy appears at score >= 2 (score > 1)
   PINK_ENEMY_UNLOCK_SCORE: 3, // Pink enemy appears at score >= 4 (score > 3)
-  BOSS_TRIGGER_SCORE: 12, // Boss battle starts at score 12
+  BOSS_TRIGGER_SCORE: 3, // Boss battle - CHANGE THIS TO TEST (mặc định: 12)
   BOSS_WARNING_DURATION_FRAMES: Math.floor(60 * 1.4), // 1.4 seconds
   BOSS_ATTACK_WARNING_FRAMES: 60, // 1 second
   BOSS_BOMB_TOTAL: 10,
@@ -290,6 +290,11 @@ class Game {
     this.ui.gameoverScreen.classList.add("hidden");
     this.ui.victoryScreen.classList.add("hidden");
 
+    // Start background music when game starts
+    if (window.startBackgroundMusic) {
+      window.startBackgroundMusic();
+    }
+
     // Reset all game objects
     this.bird.reset();
     this.pipeManager.reset();
@@ -403,8 +408,12 @@ class Game {
     const faceData = this.faceDetector.getData();
     faceData.speedMultiplier = this.faceDetector.getSpeedMultiplier();
 
-    // Update bird
-    this.bird.update(faceData, this.canvas.width, this.canvas.height);
+    // Calculate ground position (solid barrier)
+    const groundHeight = 80 * this.uiScale;
+    const groundY = this.canvas.height - groundHeight;
+
+    // Update bird with ground as solid barrier
+    this.bird.update(faceData, this.canvas.width, this.canvas.height, groundY);
 
     // Boss battle takes over when active
     if (this.boss.isActive()) {
@@ -423,6 +432,47 @@ class Game {
 
       // Check boss body collision
       if (this.boss.collide(this.bird)) {
+        this.startFalling();
+        return;
+      }
+
+      // Update enemies during boss battle (special boss mode)
+      // LGBT enemy - shoots 5 bullets, 1 second apart
+      if (!this.enemy.isActive()) {
+        this.enemy.activateBossMode(this.bird.x, this.bird.y);
+      }
+      this.enemy.update(this.bird.x, this.bird.y);
+      
+      // Check LGBT enemy collision
+      if (this.enemy.checkCollision(this.bird.getHitbox())) {
+        this.startFalling();
+        return;
+      }
+
+      // Pink enemy during boss
+      if (!this.pinkEnemy.isActive()) {
+        this.pinkEnemy.activate(
+          this.score,
+          this.bird.x,
+          this.bird.y,
+          this.canvas.width,
+          this.canvas.height,
+        );
+      }
+      this.pinkEnemy.update(this.bird.x, this.bird.y);
+      
+      // Check Pink enemy collision
+      if (this.pinkEnemy.checkCollision(this.bird.getHitbox())) {
+        this.startFalling();
+        return;
+      }
+
+      // Update bullets
+      this.bulletManager.update();
+      
+      // Check bullet collision
+      const bulletHit = this.bulletManager.checkCollision(this.bird.getHitbox());
+      if (bulletHit) {
         this.startFalling();
         return;
       }
@@ -451,8 +501,9 @@ class Game {
         // Stop spawning pipes and clear existing pipes (giống Python)
         this.pipeManager.stopSpawning();
         this.pipeManager.clearAllPipes(); // Clear all pipes for boss battle
-        this.enemy.reset();
-        this.pinkEnemy.reset();
+        // Không reset enemy và pinkEnemy - chúng sẽ xuất hiện trong boss battle
+        // this.enemy.reset();
+        // this.pinkEnemy.reset();
         return;
       }
     }
@@ -543,9 +594,24 @@ class Game {
    * Start falling animation (giống Python)
    */
   startFalling() {
+    // Chỉ xử lý nếu chưa đang falling
+    if (this.state === "falling") return;
+    
     this.state = "falling";
     this.fallVelocity = -8 * this.uiScale; // Initial upward bump
     this.fallRotation = this.bird.rotation;
+
+    // Stop background music IMMEDIATELY
+    if (window.stopBackgroundMusic) {
+      window.stopBackgroundMusic();
+    }
+
+    // Play game over sound IMMEDIATELY when hit
+    const gameOverSound = document.getElementById("gameOverSound");
+    if (gameOverSound) {
+      gameOverSound.currentTime = 0; // Reset sound
+      gameOverSound.play().catch(e => console.log("Cannot play sound:", e));
+    }
   }
 
   /**
@@ -649,10 +715,21 @@ class Game {
       localStorage.setItem("flappyHighScore", this.highScore.toString());
     }
 
-    // Show game over screen
+    // Show game over screen with replay button (như cũ)
     this.ui.finalScore.textContent = this.score;
     this.ui.highScoreDisplay.textContent = this.highScore;
     this.ui.gameoverScreen.classList.remove("hidden");
+  }
+
+  returnToStart() {
+    // Hide game over screen
+    this.ui.gameoverScreen.classList.add("hidden");
+    
+    // Show start screen
+    this.ui.startScreen.classList.remove("hidden");
+    
+    // Reset game state for next play
+    this.state = "start";
   }
 
   updateUI() {

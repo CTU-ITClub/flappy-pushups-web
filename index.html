@@ -99,6 +99,17 @@
         <p id="loading-status">Đang khởi tạo AI nhận diện khuôn mặt...</p>
         <div class="loader"></div>
       </div>
+
+      <!-- Audio Elements -->
+      <audio id="bgMusic" preload="auto" loop>
+        <source src="assets/nhac_nen.mp3" type="audio/mpeg">
+      </audio>
+      <audio id="gameOverSound" preload="auto">
+        <source src="assets/nhac_thua.mp3" type="audio/mpeg">
+      </audio>
+
+      <!-- Music Toggle Button -->
+      <button id="music-toggle" title="Bật/Tắt nhạc">🎵</button>
     </div>
 
     <!-- Game Scripts -->
@@ -110,5 +121,47 @@
     <script src="js/pinkEnemy.js"></script>
     <script src="js/boss.js"></script>
     <script src="js/game.js"></script>
+
+    <!-- Music Toggle Script -->
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const musicToggle = document.getElementById('music-toggle');
+        const bgMusic = document.getElementById('bgMusic');
+        let musicPlaying = false;
+
+        // Set volume
+        bgMusic.volume = 0.5;
+
+        musicToggle.addEventListener('click', () => {
+          if (musicPlaying) {
+            bgMusic.pause();
+            musicToggle.textContent = '🔇';
+            musicToggle.classList.add('muted');
+          } else {
+            bgMusic.play().catch(e => console.log("Cannot play music:", e));
+            musicToggle.textContent = '🎵';
+            musicToggle.classList.remove('muted');
+          }
+          musicPlaying = !musicPlaying;
+        });
+
+        // Expose function to start music from game.js
+        window.startBackgroundMusic = () => {
+          if (!musicPlaying) {
+            bgMusic.play().catch(e => console.log("Cannot play music:", e));
+            musicToggle.textContent = '🎵';
+            musicToggle.classList.remove('muted');
+            musicPlaying = true;
+          }
+        };
+
+        window.stopBackgroundMusic = () => {
+          bgMusic.pause();
+          musicToggle.textContent = '🔇';
+          musicToggle.classList.add('muted');
+          musicPlaying = false;
+        };
+      });
+    </script>
   </body>
 </html>

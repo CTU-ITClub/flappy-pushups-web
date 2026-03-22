@@ -25,8 +25,8 @@ class Bullet {
     this.trail = [];
     this.maxTrailLength = 10;
 
-    // Hitbox scale (smaller than visual for fairness)
-    this.hitboxScale = 0.4;
+    // Hitbox scale (bullet radius for collision)
+    this.hitboxScale = 0.8;
 
     this.active = true;
   }
