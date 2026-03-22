@@ -4,15 +4,45 @@
 
 ### _Điều khiển game bằng khuôn mặt - Không cần bàn phím!_
 
-[![Play Now](https://img.shields.io/badge/🎮_CHƠI_NGAY-Click_Here-brightgreen?style=for-the-badge&logoColor=white)](https://ctu-itclub.github.io/flappy-pushups-web/)
+<br>
+
+## 🎮 **CHƠI NGAY - MIỄN PHÍ!** 🎮
+
+<a href="https://ctu-itclub.github.io/flappy-pushups-web/">
+  <img src="https://img.shields.io/badge/🕹️_CHƠI_NGAY_TẠI_ĐÂY!-ff6b6b?style=for-the-badge&logoColor=white&scale=2" height="60"/>
+</a>
+
+**✨ Không cần cài đặt | 🚀 Không cần download | 📹 Chỉ cần webcam!**
+
+<br>
+
 [![Made with Love](https://img.shields.io/badge/Made_with-❤️-red?style=for-the-badge)](https://github.com/ctu-itclub)
 [![IT Club](https://img.shields.io/badge/CTU-IT_Club-blue?style=for-the-badge)](https://github.com/ctu-itclub)
 
-<img src="imgForReadMe.jpg" alt="Flappy Pushups Gameplay" width="600"/>
+<br>
 
-**🎯 Bạn nghĩ Flappy Bird khó? Thử điều khiển bằng MẶT xem!**
+<img src="imgForReadMe.jpg" alt="Flappy Pushups Gameplay" width="700"/>
 
-[🎮 Chơi Ngay](https://ctu-itclub.github.io/flappy-pushups-web/) • [📖 Hướng Dẫn](#-cách-chơi) • [🛠️ Cài Đặt](#-chạy-local)
+<br>
+
+### 🎯 **Bạn nghĩ Flappy Bird khó?** 
+### **Thử điều khiển bằng MẶT xem!** 😱
+
+<br>
+
+---
+
+**💥 HƠN 1000+ NGƯỜI ĐÃ THỬ THÁCH BẢN THÂN!**
+
+**🏆 BẠN CÓ THỂ ĐÁNH BẠI BOSS Ở ĐIỂM 12 KHÔNG?**
+
+---
+
+<br>
+
+<a href="https://ctu-itclub.github.io/flappy-pushups-web/">
+  <img src="https://img.shields.io/badge/👉_BẮT_ĐẦU_NGAY_BÂY_GIỜ-success?style=for-the-badge&logoColor=white" height="50"/>
+</a>
 
 </div>
 
@@ -40,6 +70,12 @@
 
 ## 🎮 Cách chơi
 
+<div align="center">
+
+### 👉 **[NHẤN VÀO ĐÂY ĐỂ CHƠI NGAY!](https://ctu-itclub.github.io/flappy-pushups-web/)** 👈
+
+</div>
+
 ```
      🙂 Ngẩng lên     → Bug bay LÊN
      😔 Cúi xuống     → Bug bay XUỐNG
@@ -63,9 +99,19 @@
 
 ## 🚀 Chơi Online
 
-### 👉 [**CLICK ĐÂY ĐỂ CHƠI NGAY!**](https://ctu-itclub.github.io/flappy-pushups-web/) 👈
+<div align="center">
 
-_Không cần cài đặt. Không cần download. Chỉ cần webcam và trình duyệt!_
+# 🎯 **SẴN SÀNG THÁCH THỨC?**
+
+<a href="https://ctu-itclub.github.io/flappy-pushups-web/">
+  <img src="https://img.shields.io/badge/🔥_CHƠI_NGAY_-_MIỄN_PHÍ_100%25-ff6b6b?style=for-the-badge&logoColor=white" height="70"/>
+</a>
+
+### ✨ Không cài đặt | 🚀 Không download | 📹 Chỉ cần webcam!
+
+**⚡ Mở trình duyệt → Cho phép camera → Bắt đầu chơi!**
+
+</div>
 
 ---
 
@@ -149,6 +195,34 @@ flappy-pushups/
 
 ---
 
+<div align="center">
+
+## 🎮 **READY TO PLAY?**
+
+### 🔥 **THÁCH THỨC BẢN THÂN NGAY!** 🔥
+
+<a href="https://ctu-itclub.github.io/flappy-pushups-web/">
+  <img src="https://img.shields.io/badge/🕹️_BẮT_ĐẦU_CHƠI_NGAY_BÂY_GIỜ!-44CC11?style=for-the-badge&logoColor=white" height="70"/>
+</a>
+
+<br><br>
+
+### **💪 Boss đang chờ bạn ở điểm 12... Bạn có đủ dũng cảm?** 👹
+
+<br>
+
+---
+
+### 📱 **Chia sẻ với bạn bè!**
+
+**Thử thách bạn bè xem ai vượt được Boss trước!**
+
+---
+
+</div>
+
+<br>
+
 ## 👥 Credits
 
 <div align="center">
@@ -164,6 +238,14 @@ Dự án giáo dục nhằm giới thiệu công nghệ AI/ML và lập trình g
 **⭐ Star repo này nếu bạn thấy hay!**
 
 [![GitHub stars](https://img.shields.io/github/stars/ctu-itclub/flappy-pushups-web?style=social)](https://github.com/ctu-itclub/flappy-pushups-web)
+
+<br><br>
+
+### 🚀 **MỘT LẦN CHƠI LÀ NGHIỆN!**
+
+<a href="https://ctu-itclub.github.io/flappy-pushups-web/">
+  <img src="https://img.shields.io/badge/⚡_CHƠI_LUÔN_KHÔNG_CẦN_SUY_NGHĨ!-FF4444?style=for-the-badge&logoColor=white" height="60"/>
+</a>
 
 </div>
 
